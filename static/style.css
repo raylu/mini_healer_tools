@@ -55,9 +55,18 @@ main section {
 	border: 1px solid #222;
 	width: 400px;
 }
-
-main h2 {
+main section h2 {
 	margin: 0 0 1em;
+}
+main section div.type {
+	color: #777;
+	margin-bottom: 1em;
+}
+main section div.desc {
+	margin-bottom: 1em;
+}
+main section div.props {
+	color: #777;
 }
 
 footer {

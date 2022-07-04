@@ -34,7 +34,8 @@ def artifact(request, key):
 
 	string_keys = ['ArtifactName', 'specialDesc']
 	for string_key in string_keys:
-		data[string_key] = artifact_strings[data[string_key]]
+		if string_key in data:
+			data[string_key] = artifact_strings[data[string_key]]
 	return Response.json(data)
 
 def static(request, path):
@@ -44,6 +45,7 @@ def static(request, path):
 
 routes = [
 	('GET', '/', root),
+	('GET', '/artifacts', artifacts_page),
 	('GET', '/artifacts/<name>', artifacts_page),
 	('GET', '/data/artifact_names', get_artifact_names),
 	('GET', '/data/artifact/<key>', artifact),
