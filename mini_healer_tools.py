@@ -8,6 +8,7 @@ if len(sys.argv) == 3:
 
 # pylint: disable=wrong-import-position
 import collections
+import copy
 import mimetypes
 import json
 
@@ -27,9 +28,14 @@ def get_artifact_names(request):
 
 def artifact(request, key):
 	try:
-		return Response.json(artifacts[key])
+		data = copy.copy(artifacts[key])
 	except KeyError:
 		raise HTTPException(404, '%r not found\n' % key)
+
+	string_keys = ['ArtifactName', 'specialDesc']
+	for string_key in string_keys:
+		data[string_key] = artifact_strings[data[string_key]]
+	return Response.json(data)
 
 def static(request, path):
 	content_type, _ = mimetypes.guess_type(path)

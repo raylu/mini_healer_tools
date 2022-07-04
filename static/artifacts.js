@@ -49,7 +49,6 @@
 		main.innerHTML = '';
 		for (const key of keys) {
 			const section = document.createElement('section');
-			section.innerText = key;
 			main.appendChild(section);
 			load(key, section);
 		}
@@ -58,5 +57,12 @@
 	async function load(key, section) {
 		const res = await fetch('/data/artifact/' + key);
 		const artifact = await res.json();
+
+		const name = document.createElement('h2');
+		name.innerText = artifact['ArtifactName'];
+		section.appendChild(name);
+		const desc = document.createElement('div');
+		desc.innerHTML = artifact['specialDesc'];
+		section.appendChild(desc);
 	}
 })();
