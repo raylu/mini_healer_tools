@@ -13,7 +13,7 @@ def main():
 		('ArtifactData', 0x200),
 		('Bosses', 0x200),
 		('AT', 0x06e460b8),
-		('ATTRIBUTE', 0x06b34800),
+		('ATTRIBUTE', 0x06d8a090),
 		('ARTIFACT', 0x06e493e0),
 	]
 	with open('raw/resources.assets', 'rb') as asset_f:

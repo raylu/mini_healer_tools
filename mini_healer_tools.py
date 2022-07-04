@@ -35,7 +35,7 @@ def artifact(request, key):
 	string_keys = ['ArtifactName', 'specialDesc']
 	for string_key in string_keys:
 		if string_key in data:
-			data[string_key] = artifact_strings[data[string_key]]
+			data[string_key] = strings[data[string_key]]
 	return Response.json(data)
 
 def static(request, path):
@@ -53,24 +53,25 @@ routes = [
 ]
 
 app = PigWig(routes)
-artifacts = artifact_strings = artifact_names = None
+artifacts = strings = artifact_names = None
 
 def main():
-	global artifacts, artifact_strings, artifact_names
-	with open('extracted/ARTIFACT', 'r', encoding='utf-8') as f:
-		artifact_strings = {}
-		for line in f:
-			if line == '\n' or line == 'END':
-				continue
-			key, value = line.rstrip('\n').split('=', 1)
-			artifact_strings[key] = value
+	global artifacts, strings, artifact_names
+	strings = {}
+	for filename in ['ARTIFACT', 'ATTRIBUTE']:
+		with open('extracted/' + filename, 'r', encoding='utf-8') as f:
+			for line in f:
+				if line == '\n' or line == 'END':
+					continue
+				key, value = line.rstrip('\n').split('=', 1)
+				strings[key] = value
 	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 		artifact_data = json.load(f)['Artifacts']
 		artifacts = {}
 		artifact_names = collections.defaultdict(list)
 		for artifact in artifact_data:
 			try:
-				name = artifact_strings[artifact['ArtifactName']]
+				name = strings[artifact['ArtifactName']]
 			except KeyError:
 				continue
 			artifacts[artifact['Key']] = artifact
