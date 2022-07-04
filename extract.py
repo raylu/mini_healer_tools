@@ -13,13 +13,15 @@ def main():
 		('ArtifactData', 0x200),
 		('Bosses', 0x200),
 		('AT', 0x06e460b8),
+		('ATTRIBUTE', 0x06b34800),
+		('ARTIFACT', 0x06e493e0),
 	]
 	with open('raw/resources.assets', 'rb') as asset_f:
 		for filename, offset in files:
 			print('extracting', filename)
 			d = read_file(asset_f, filename.encode('ascii'), offset)
 			with open('extracted/' + filename, 'w') as extracted_f:
-				extracted_f.write(d.decode('ascii'))
+				extracted_f.write(d.decode('utf-8'))
 
 def read_file(f, filename, offset):
 	f.seek(offset, os.SEEK_SET)
