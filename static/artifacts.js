@@ -104,7 +104,12 @@
 
 		if (artifact['specialDesc']) {
 			const desc = document.createElement('div');
-			desc.innerHTML = artifact['specialDesc'];
+			const replace = (needle) => {
+				const textVar = needle.substr(1, needle.length - 2);
+				const replacement = artifact['strings'][textVar];
+				return replacement ? replacement : needle;
+			};
+			desc.innerHTML = artifact['specialDesc'].replaceAll(/\[\S+\]/g, replace);
 			desc.classList.add('desc')
 			section.appendChild(desc);
 		}

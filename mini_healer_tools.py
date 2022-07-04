@@ -11,6 +11,7 @@ import collections
 import copy
 import mimetypes
 import json
+import re
 
 from pigwig import PigWig, Response
 from pigwig.exceptions import HTTPException
@@ -32,16 +33,26 @@ def artifact(request, key):
 	except KeyError:
 		raise HTTPException(404, '%r not found\n' % key)
 
-	string_keys = ['ArtifactName', 'specialDesc']
-	for string_key in string_keys:
-		if string_key in data:
-			data[string_key] = strings[data[string_key]]
+	if 'ArtifactName' in data:
+		data['ArtifactName'] = strings[data['ArtifactName']]
+	if 'specialDesc' in data:
+		data['specialDesc'] = strings[data['specialDesc']]
+		data['strings'] = {}
+		for m in re.finditer(r'\[(\S+)\]', data['specialDesc']):
+			var = m.group(1)
+			try:
+				data['strings'][var] = strings[var]
+			except KeyError:
+				pass
 	return Response.json(data)
 
 def static(request, path):
 	content_type, _ = mimetypes.guess_type(path)
-	with open('static/' + path, 'rb') as f:
-		return Response(f.read(), content_type=content_type)
+	try:
+		with open('static/' + path, 'rb') as f:
+			return Response(f.read(), content_type=content_type)
+	except FileNotFoundError:
+		raise HTTPException(404, '%r not found\n' % path)
 
 routes = [
 	('GET', '/', root),
@@ -58,7 +69,7 @@ artifacts = strings = artifact_names = None
 def main():
 	global artifacts, strings, artifact_names
 	strings = {}
-	for filename in ['ARTIFACT', 'ATTRIBUTE']:
+	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT']:
 		with open('extracted/' + filename, 'r', encoding='utf-8') as f:
 			for line in f:
 				if line == '\n' or line == 'END':
