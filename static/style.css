@@ -100,6 +100,7 @@ main.talents div.tree .talent {
 	height: 74px;
 	width: 64px;
 	border: 1px solid #755;
+	cursor: pointer;
 }
 
 main.talents div.info {

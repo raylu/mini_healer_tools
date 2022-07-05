@@ -22,8 +22,10 @@
 	}
 
 	const tree = document.querySelector('main div.tree');
+	const info = document.querySelector('main div.info');
 	function showTree(index) {
 		tree.innerHTML = '';
+		info.innerHTML = '';
 		for (const talent of Object.values(talents['talents'])) {
 			if (talent['Type'] !== index)
 				continue;
@@ -42,7 +44,6 @@
 			showTalentInfo(key);
 	});
 
-	const info = document.querySelector('main div.info');
 	function showTalentInfo(key) {
 		const talent = talents['talents'][key];
 		info.innerHTML = '';
