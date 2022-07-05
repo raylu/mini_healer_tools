@@ -46,6 +46,18 @@
 		name.innerText = talent['TalentName'];
 		info.appendChild(name);
 
+		if (talent['desc']) {
+			const desc = document.createElement('div');
+			desc.classList.add('desc');
+			const replace = (needle) => {
+				const textVar = needle.substr(1, needle.length - 2);
+				const replacement = talents['strings'][textVar];
+				return replacement ? replacement : needle;
+			};
+			desc.innerHTML = talent['desc'].replaceAll(/\[\S+\]/g, replace);
+			info.appendChild(desc);
+		}
+
 		const extra = document.createElement('div');
 		extra.classList.add('extra');
 		extra.innerText = `Maximum of ${talent['maxLevel']} levels`;

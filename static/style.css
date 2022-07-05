@@ -96,6 +96,10 @@ main.talents div.tree .talent {
 main.talents div.info {
 	width: 400px;
 }
+main.talents div.info div.desc {
+	margin-bottom: 1em;
+}
+
 
 footer {
 	text-align: center;

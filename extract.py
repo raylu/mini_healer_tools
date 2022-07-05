@@ -14,6 +14,7 @@ def main():
 		('SkillData', 0x200),
 		('TalentData', 0x200),
 		('Bosses', 0x200),
+		('skill_info', 0x200),
 		('AT', 0x06e460b8),
 		('ATTRIBUTE', 0x06d8a090),
 		('ARTIFACT', 0x06e493e0),

@@ -38,13 +38,7 @@ def artifact(request, key):
 		data['ArtifactName'] = strings[data['ArtifactName']]
 	if 'specialDesc' in data:
 		data['specialDesc'] = strings[data['specialDesc']]
-		data['strings'] = {}
-		for m in re.finditer(r'\[(\S+)\]', data['specialDesc']):
-			var = m.group(1)
-			try:
-				data['strings'][var] = strings[var]
-			except KeyError:
-				pass
+		data['strings'] = _fetch_strings(data['specialDesc'])
 	return Response.json(data)
 
 def get_talents(request):
@@ -57,6 +51,16 @@ def static(request, path):
 			return Response(f.read(), content_type=content_type)
 	except FileNotFoundError:
 		raise HTTPException(404, '%r not found\n' % path)
+
+def _fetch_strings(s):
+	extra_strings = {}
+	for m in re.finditer(r'\[(\S+)\]', s):
+		var = m.group(1)
+		try:
+			extra_strings[var] = strings[var]
+		except KeyError:
+			pass
+	return extra_strings
 
 routes = [
 	('GET', '/', root),
@@ -97,13 +101,18 @@ def main():
 	with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 		talent_data = json.load(f)['Talents']
 		talent_dict = {}
+		talent_strings = {}
 		for talent in talent_data:
 			try:
 				talent['TalentName'] = strings[talent['TalentName']]
 			except KeyError:
 				continue
-			talent_dict[talent['Key']] = talent
-		talents = {'talents': talent_dict}
+			key = talent['Key']
+			talent['desc'] = strings.get('TALENT_%s_DESC' % key)
+			if talent['desc'] is not None:
+				talent_strings.update(_fetch_strings(talent['desc']))
+			talent_dict[key] = talent
+		talents = {'talents': talent_dict, 'strings': talent_strings}
 
 	if len(sys.argv) == 3:
 		addr = sys.argv[1]
