@@ -42,7 +42,7 @@ form#search div#results {
 	cursor: pointer;
 }
 
-main {
+main, header {
 	width: 90%;
 	max-width: 1200px;
 	margin: 10px auto 100px;
@@ -74,6 +74,15 @@ main.artifacts section div.desc {
 }
 main.artifacts section div.props {
 	color: #777;
+}
+
+header.talents {
+	display: flex;
+	justify-content: space-evenly;
+}
+header.talents h2 {
+	color: #79a;
+	cursor: pointer;
 }
 
 main.talents {
