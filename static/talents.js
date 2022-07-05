@@ -7,14 +7,19 @@
 	const talents = await fetchTalents();
 
 	const header = document.querySelector('header');
-	const classes = ['Druid', 'Priest', 'Occultist', 'Paladin'];
-	classes.forEach((cl, i) => {
+	const classes = {
+		'Druid': 0,
+		'Priest': 1,
+		'Occultist': 2,
+		'Paladin': 5,
+	};
+	for (const [cl, i] of Object.entries(classes)) {
 		const h2 = document.createElement('h2');
 		h2.innerText = cl;
 		h2.dataset.treeIndex = i;
 		header.appendChild(h2);
 		h2.addEventListener('click', () => showTree(i));
-	});
+	}
 
 	const tree = document.querySelector('main div.tree');
 	function showTree(index) {
