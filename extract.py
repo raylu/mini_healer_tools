@@ -11,11 +11,14 @@ def main():
 
 	files = [
 		('ArtifactData', 0x200),
+		('SkillData', 0x200),
+		('TalentData', 0x200),
 		('Bosses', 0x200),
 		('AT', 0x06e460b8),
 		('ATTRIBUTE', 0x06d8a090),
 		('ARTIFACT', 0x06e493e0),
 		('CONTEXT', 0x06e882b0),
+		('TALENT', 0x06c0d6f0),
 	]
 	with open('raw/resources.assets', 'rb') as asset_f:
 		for filename, offset in files:
