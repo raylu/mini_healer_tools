@@ -40,7 +40,16 @@
 	const info = document.querySelector('main div.info');
 	function showTalentInfo(key) {
 		const talent = talents['talents'][key];
-		info.innerText = talent['TalentName'];
+		info.innerHTML = '';
+
+		const name = document.createElement('h2');
+		name.innerText = talent['TalentName'];
+		info.appendChild(name);
+
+		const extra = document.createElement('div');
+		extra.classList.add('extra');
+		extra.innerText = `Maximum of ${talent['maxLevel']} levels`;
+		info.appendChild(extra);
 	}
 
 	showTree(0);

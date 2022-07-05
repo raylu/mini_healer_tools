@@ -96,7 +96,13 @@ def main():
 			artifact_names[name].append(artifact['Key'])
 	with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 		talent_data = json.load(f)['Talents']
-		talent_dict = {talent['Key']: talent for talent in talent_data}
+		talent_dict = {}
+		for talent in talent_data:
+			try:
+				talent['TalentName'] = strings[talent['TalentName']]
+			except KeyError:
+				continue
+			talent_dict[talent['Key']] = talent
 		talents = {'talents': talent_dict}
 
 	if len(sys.argv) == 3:
