@@ -17,12 +17,10 @@ from pigwig import PigWig, Response
 from pigwig.exceptions import HTTPException
 
 def root(request):
-	with open('html/index.html', 'rb') as f:
-		return Response(f.read(), content_type='text/html; charset=UTF-8')
+	return Response.render(request, 'index.jinja2', {})
 
 def artifacts_page(request, name=None):
-	with open('html/artifacts.html', 'rb') as f:
-		return Response(f.read(), content_type='text/html; charset=UTF-8')
+	return Response.render(request, 'artifacts.jinja2', {})
 
 def get_artifact_names(request):
 	return Response.json(artifact_names)
@@ -63,7 +61,7 @@ routes = [
 	('GET', '/static/<path:path>', static),
 ]
 
-app = PigWig(routes)
+app = PigWig(routes, template_dir='html')
 artifacts = strings = artifact_names = None
 
 def main():
