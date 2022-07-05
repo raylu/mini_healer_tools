@@ -34,6 +34,11 @@
 			talentDiv.dataset.key = talent['Key'];
 			talentDiv.style.gridRow = talent['tier'];
 			talentDiv.style.gridColumn = talent['Position'] + 1;
+
+			const img = document.createElement('img');
+			img.src = `/static/talents/${talent['Key']}.png`
+			talentDiv.appendChild(img);
+
 			tree.appendChild(talentDiv);
 		}
 	}
