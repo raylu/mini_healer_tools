@@ -22,8 +22,8 @@ def root(request):
 def artifacts_page(request, name=None):
 	return Response.render(request, 'artifacts.jinja2', {})
 
-def talents_page(request, name=None):
-	return Response.render(request, 'talents.jinja2', {})
+def build_page(request, name=None):
+	return Response.render(request, 'build.jinja2', {})
 
 def get_artifact_names(request):
 	return Response.json(artifact_names)
@@ -66,7 +66,7 @@ routes = [
 	('GET', '/', root),
 	('GET', '/artifacts', artifacts_page),
 	('GET', '/artifacts/<name>', artifacts_page),
-	('GET', '/talents', talents_page),
+	('GET', '/build', build_page),
 	('GET', '/data/artifact_names', get_artifact_names),
 	('GET', '/data/artifact/<key>', artifact),
 	('GET', '/data/talents', get_talents),

@@ -81,41 +81,41 @@ main.artifacts section div.props {
 	color: #777;
 }
 
-header.talents {
+header.build {
 	display: flex;
 	justify-content: space-evenly;
 }
-header.talents h2 {
+header.build h2 {
 	color: #79a;
 	cursor: pointer;
 }
 
-main.talents {
+main.build {
 	display: flex;
 	justify-content: space-evenly;
 }
 
-main.talents div.tree {
+main.build div.tree {
 	display: grid;
 	grid-template-rows: repeat(10, 90px);
 	grid-template-columns: repeat(5, 76px);
 	width: 370px;
 }
-main.talents div.tree .talent {
+main.build div.tree .talent {
 	height: 80px;
 	width: 66px;
 	border: 1px solid #755;
 	cursor: pointer;
 }
-main.talents div.tree .talent img {
+main.build div.tree .talent img {
 	width: 64px;
 	height: 64px;
 }
 
-main.talents div.info {
+main.build div.info {
 	width: 400px;
 }
-main.talents div.info div.desc {
+main.build div.info div.desc {
 	margin-bottom: 1em;
 }
 
