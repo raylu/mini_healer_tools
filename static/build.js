@@ -40,30 +40,25 @@
 			img.src = `/static/talents/${talent['Key']}.png`
 			talentDiv.appendChild(img);
 
+			talentDiv.append(0);
+
 			tree.appendChild(talentDiv);
 		}
 	}
 
-	tree.addEventListener('click', (event) => {
-		const key = treeClickTalentKey(event.target);
-		if (key)
-			handleTalentClick(key, true);
-	});
-	tree.addEventListener('contextmenu', (event) => {
-		const key = treeClickTalentKey(event.target);
-		if (key) {
-			event.preventDefault();
-			handleTalentClick(key, false);
-		}
-	});
+	tree.addEventListener('click', (event) => handleTalentClick(event, true));
+	tree.addEventListener('contextmenu', (event) => handleTalentClick(event, false));
 
-	function treeClickTalentKey(target) {
+	function handleTalentClick(event, incr) {
+		let target = event.target;
 		if (event.target.tagName == 'IMG')
 			target = target.parentElement;
-		return target.dataset.key;
-	}
+		const key = target.dataset.key;
+		if (!key)
+			return;
+		if (!incr)
+			event.preventDefault();
 
-	function handleTalentClick(key, incr) {
 		const talent = talents['talents'][key];
 		showTalentInfo(talent);
 
@@ -73,18 +68,20 @@
 		// total of 10 bits
 		const urlKey = (talent['Type'] << 7) | (talent['tier'] << 3) | (talent['Position']);
 
+		let points = selectedTalents[urlKey] || 0;
 		if (incr) {
-			if (selectedTalents[urlKey] === undefined)
-				selectedTalents[urlKey] = 1;
-			else if (selectedTalents[urlKey] < talent['maxLevel'])
-				selectedTalents[urlKey]++;
+			if (points < talent['maxLevel'])
+				points++;
 		} else {
-			if (selectedTalents[urlKey] > 1)
-				selectedTalents[urlKey]--;
-			else
-				delete selectedTalents[urlKey];
+			if (points > 0)
+				points--;
 		}
+		if (points > 0)
+			selectedTalents[urlKey] = points;
+		else
+			delete selectedTalents[urlKey];
 
+		target.childNodes[1].textContent = points;
 		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify({'talents': selectedTalents},  {AQF: true}));
 	}
 
