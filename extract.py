@@ -13,6 +13,7 @@ def main():
 		('ArtifactData', 0x200),
 		('SkillData', 0x200),
 		('TalentData', 0x200),
+		('AttributesData', 0x200),
 		('Bosses', 0x200),
 		('skill_info', 0x200),
 		('AT', 0x06e460b8),
