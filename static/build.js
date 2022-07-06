@@ -5,7 +5,7 @@
 		return await res.json();
 	}
 	const talents = await fetchTalents();
-	const selectedTalents = {};
+	const selectedTalents = parseURL();
 
 	const header = document.querySelector('header');
 	const classes = {
@@ -20,6 +20,15 @@
 		h2.dataset.treeIndex = i;
 		header.appendChild(h2);
 		h2.addEventListener('click', () => showTree(i));
+	}
+
+	function parseURL() {
+		let selectedTalents = {};
+		if (location.search.substr(0, 3) === '?s=') {
+			const build = JsonURL.parse(location.search.substr(3), {AQF: true});
+			selectedTalents = build['talents'];
+		}
+		return selectedTalents;
 	}
 
 	const tree = document.querySelector('main div.tree');
@@ -40,7 +49,8 @@
 			img.src = `/static/talents/${talent['Key']}.png`
 			talentDiv.appendChild(img);
 
-			talentDiv.append(0);
+			const points = selectedTalents[talentUrlKey(talent)] || 0;
+			talentDiv.append(points);
 
 			tree.appendChild(talentDiv);
 		}
@@ -62,12 +72,7 @@
 		const talent = talents['talents'][key];
 		showTalentInfo(talent);
 
-		// type/class: 3 bits
-		// tier: 4 bits
-		// position: 3 bits
-		// total of 10 bits
-		const urlKey = (talent['Type'] << 7) | (talent['tier'] << 3) | (talent['Position']);
-
+		const urlKey = talentUrlKey(talent);
 		let points = selectedTalents[urlKey] || 0;
 		if (incr) {
 			if (points < talent['maxLevel'])
@@ -82,7 +87,15 @@
 			delete selectedTalents[urlKey];
 
 		target.childNodes[1].textContent = points;
-		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify({'talents': selectedTalents},  {AQF: true}));
+		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify({'talents': selectedTalents}, {AQF: true}));
+	}
+
+	function talentUrlKey(talent) {
+		// type/class: 3 bits
+		// tier: 4 bits
+		// position: 3 bits
+		// total of 10 bits
+		return (talent['Type'] << 7) | (talent['tier'] << 3) | (talent['Position']);
 	}
 
 	function showTalentInfo(talent) {
