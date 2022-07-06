@@ -1,31 +1,68 @@
 'use strict';
-(async () => {
-	async function fetchArtifactNames() {
+
+class Artifacts {
+	constructor() {
+		this.artifactNames = null;
+		this.searchTimeout = null;
+
+		this.slots = {
+			0: {
+				0: 'Axe',
+				1: 'Sword',
+				2: 'Wand',
+				3: 'Bow',
+				9: 'Dagger',
+				14: 'Staff',
+				15: 'Hammer',
+			},
+			1: {
+				4: 'Shield',
+				5: 'Body Armor',
+				6: 'Helm',
+				7: 'Glove',
+				17: 'Boot',
+				19: 'Pants',
+			},
+			2: {
+				8: 'Relic',
+				11: 'Arrow',
+				12: 'Ring',
+				13: 'Amulet',
+			},
+		}
+		this.rarities = {
+			3: 'Unique',
+		}
+	}
+
+	async fetchArtifactNames() {
 		const res = await fetch('/data/artifact_names');
-		return await res.json();
-	}
-	const artifactNames = await fetchArtifactNames();
-
-	let searchTimeout = null;
-	const searchInput = document.querySelector('form#search input[name=q]');
-	searchInput.addEventListener('input', (event) => {
-		const q = event.target.value;
-		if (searchTimeout !== null)
-			clearTimeout(searchTimeout);
-		searchTimeout = setTimeout(search, 200, q);
-	});
-
-	if (window.location.pathname.substr(0, 11) === '/artifacts/') {
-		const name = decodeURIComponent(window.location.pathname.substr(11));
-		loadKeys(artifactNames[name]);
-		searchInput.value = name;
+		this.artifactNames = await res.json();
 	}
 
-	const results = document.querySelector('div#results');
-	function search(q) {
+	setupSearch(resultsCB) {
+		const searchInput = document.querySelector('form#search input[name=q]');
+		searchInput.addEventListener('input', (event) => {
+			const q = event.target.value;
+			if (this.searchTimeout !== null)
+				clearTimeout(this.searchTimeout);
+			this.searchTimeout = setTimeout(() => this.search(q), 200);
+		});
+
+		const results = document.querySelector('div#results');
+		results.addEventListener('click', (event) => {
+			results.innerHTML = '';
+			const dataset = event.target.dataset;
+			const keys = dataset.keys.split(',');
+			resultsCB(keys, dataset.name);
+		});
+	}
+
+	search(q) {
+		const results = document.querySelector('div#results');
 		results.innerHTML = '';
-		q = q.toLowerCase()
-		for (const [name, keys] of Object.entries(artifactNames)) {
+		q = q.toLowerCase();
+		for (const [name, keys] of Object.entries(this.artifactNames)) {
 			if (name.toLowerCase().indexOf(q) !== -1) {
 				const result = document.createElement('div');
 				result.classList.add('result');
@@ -37,53 +74,7 @@
 		}
 	}
 
-	results.addEventListener('click', (event) => {
-		results.innerHTML = '';
-		const dataset = event.target.dataset;
-		history.pushState({}, '', '/artifacts/' + dataset.name);
-		const keys = dataset.keys.split(',');
-		loadKeys(keys);
-	});
-	function loadKeys(keys) {
-		const main = document.querySelector('main');
-		main.innerHTML = '';
-		for (const key of keys) {
-			const section = document.createElement('section');
-			main.appendChild(section);
-			load(key, section);
-		}
-	}
-
-	const slots = {
-		0: {
-			0: 'Axe',
-			1: 'Sword',
-			2: 'Wand',
-			3: 'Bow',
-			9: 'Dagger',
-			14: 'Staff',
-			15: 'Hammer',
-		},
-		1: {
-			4: 'Shield',
-			5: 'Body Armor',
-			6: 'Helm',
-			7: 'Glove',
-			17: 'Boot',
-			19: 'Pants',
-		},
-		2: {
-			8: 'Relic',
-			11: 'Arrow',
-			12: 'Ring',
-			13: 'Amulet',
-		},
-	}
-	const rarities = {
-		3: 'Unique',
-	}
-
-	async function load(key, section) {
+	async load(key, section) {
 		const res = await fetch('/data/artifact/' + key);
 		const artifact = await res.json();
 
@@ -93,9 +84,9 @@
 
 		const type = document.createElement('div');
 		const types = [
-			slots[artifact['SlotType']][artifact['Type']],
+			this.slots[artifact['SlotType']][artifact['Type']],
 		];
-		if (artifact['Rarity']) types.push(rarities[artifact['Rarity']]);
+		if (artifact['Rarity']) types.push(this.rarities[artifact['Rarity']]);
 		if (artifact['isUltraRare']) types.push('Ultra Rare');
 		if (artifact['isChaotic']) types.push('Chaotic');
 		type.innerHTML = types.join(', ');
@@ -121,5 +112,36 @@
 			props.innerHTML += '<br>drop rate: ' + artifact['DropRate'] * 100 + '%';
 		props.classList.add('props')
 		section.appendChild(props);
+	}
+}
+
+(async () => {
+	if (window.location.pathname.substr(0, 10) !== '/artifacts')
+		return;
+
+	const artifacts = new Artifacts();
+	await artifacts.fetchArtifactNames();
+	artifacts.setupSearch(resultsCB);
+
+	if (window.location.pathname.substr(0, 11) === '/artifacts/') {
+		const name = decodeURIComponent(window.location.pathname.substr(11));
+		loadKeys(artifacts.artifactNames[name]);
+		const searchInput = document.querySelector('form#search input[name=q]');
+		searchInput.value = name;
+	}
+
+	function resultsCB(keys, name) {
+		history.pushState({}, '', '/artifacts/' + name);
+		loadKeys(keys);
+	}
+
+	function loadKeys(keys) {
+		const main = document.querySelector('main');
+		main.innerHTML = '';
+		for (const key of keys) {
+			const section = document.createElement('section');
+			main.appendChild(section);
+			artifacts.load(key, section);
+		}
 	}
 })();
