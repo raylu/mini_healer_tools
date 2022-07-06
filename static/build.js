@@ -21,6 +21,9 @@
 		header.appendChild(h2);
 		h2.addEventListener('click', () => showTree(i));
 	}
+	header.appendChild(document.createElement('h2'));
+	header.children[4].innerText = 'Items';
+	header.children[4].addEventListener('click', showItems);
 
 	function parseURL() {
 		let selectedTalents = {};
@@ -31,9 +34,12 @@
 		return selectedTalents;
 	}
 
+	const main = document.querySelector('main');
 	const tree = document.querySelector('main div.tree');
 	const info = document.querySelector('main div.info');
+	const items = document.querySelector('main div.items');
 	function showTree(index) {
+		main.innerHTML = '';
 		tree.innerHTML = '';
 		info.innerHTML = '';
 		for (const talent of Object.values(talents['talents'])) {
@@ -54,6 +60,8 @@
 
 			tree.appendChild(talentDiv);
 		}
+		main.appendChild(tree);
+		main.appendChild(info);
 	}
 
 	tree.addEventListener('click', (event) => handleTalentClick(event, true));
@@ -121,6 +129,11 @@
 		extra.classList.add('extra');
 		extra.innerText = `Maximum of ${talent['maxLevel']} levels`;
 		info.appendChild(extra);
+	}
+
+	function showItems() {
+		main.innerHTML = '';
+		main.appendChild(items);
 	}
 
 	showTree(0);
