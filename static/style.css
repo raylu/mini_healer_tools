@@ -60,6 +60,11 @@ main section h2 {
 	margin: 0 0 1em;
 }
 
+main.root {
+	display: flex;
+	justify-content: space-evenly;
+}
+
 main.artifacts {
 	display: flex;
 	flex-wrap: wrap;
