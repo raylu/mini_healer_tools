@@ -44,7 +44,10 @@
 	}
 
 	tree.addEventListener('click', (event) => {
-		const key = event.target.dataset.key;
+		let target = event.target;
+		if (event.target.tagName == 'IMG')
+			target = target.parentElement;
+		const key = target.dataset.key;
 		if (key)
 			showTalentInfo(key);
 	});
