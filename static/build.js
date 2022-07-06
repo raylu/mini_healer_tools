@@ -5,6 +5,7 @@
 		return await res.json();
 	}
 	const talents = await fetchTalents();
+	const selectedTalents = {};
 
 	const header = document.querySelector('header');
 	const classes = {
@@ -44,16 +45,50 @@
 	}
 
 	tree.addEventListener('click', (event) => {
-		let target = event.target;
-		if (event.target.tagName == 'IMG')
-			target = target.parentElement;
-		const key = target.dataset.key;
+		const key = treeClickTalentKey(event.target);
 		if (key)
-			showTalentInfo(key);
+			handleTalentClick(key, true);
+	});
+	tree.addEventListener('contextmenu', (event) => {
+		const key = treeClickTalentKey(event.target);
+		if (key) {
+			event.preventDefault();
+			handleTalentClick(key, false);
+		}
 	});
 
-	function showTalentInfo(key) {
+	function treeClickTalentKey(target) {
+		if (event.target.tagName == 'IMG')
+			target = target.parentElement;
+		return target.dataset.key;
+	}
+
+	function handleTalentClick(key, incr) {
 		const talent = talents['talents'][key];
+		showTalentInfo(talent);
+
+		// type/class: 3 bits
+		// tier: 4 bits
+		// position: 3 bits
+		// total of 10 bits
+		const urlKey = (talent['Type'] << 7) | (talent['tier'] << 3) | (talent['Position']);
+
+		if (incr) {
+			if (selectedTalents[urlKey] === undefined)
+				selectedTalents[urlKey] = 1;
+			else if (selectedTalents[urlKey] < talent['maxLevel'])
+				selectedTalents[urlKey]++;
+		} else {
+			if (selectedTalents[urlKey] > 1)
+				selectedTalents[urlKey]--;
+			else
+				delete selectedTalents[urlKey];
+		}
+
+		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify({'talents': selectedTalents},  {AQF: true}));
+	}
+
+	function showTalentInfo(talent) {
 		info.innerHTML = '';
 
 		const name = document.createElement('h2');
