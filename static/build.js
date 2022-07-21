@@ -139,8 +139,9 @@
 		main.appendChild(items);
 	}
 
+	const pendingItem = document.querySelector('main .items #pending_item');
+	const selectedItems = document.querySelector('main .items #selected_items');
 	function artifactsCB(keys, name) {
-		const pendingItem = document.querySelector('main .items #pending_item');
 		pendingItem.innerHTML = '';
 		for (const key of keys) {
 			const section = document.createElement('section');
@@ -149,6 +150,22 @@
 			pendingItem.appendChild(section);
 		}
 	}
+
+	pendingItem.addEventListener('click', (event) => {
+		let target = event.target;
+		let found = false;
+		while (target.id !== 'pending_item') {
+			if (target.tagName === 'SECTION' && target.classList.contains('artifact')) {
+				found = true;
+				break;
+			}
+			target = target.parentElement;
+		}
+		if (!found) return;
+
+		pendingItem.innerHTML = '';
+		selectedItems.appendChild(target);
+	});
 
 	showTree(0);
 })();

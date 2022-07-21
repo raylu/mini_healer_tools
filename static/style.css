@@ -66,7 +66,7 @@ main.root {
 	justify-content: space-evenly;
 }
 
-main.artifacts, div#pending_item {
+main.artifacts, div#pending_item, div#selected_items {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-evenly;
@@ -121,6 +121,13 @@ main.build div.info div.desc {
 	margin-bottom: 1em;
 }
 
+main.build div.items div#pending_item section.artifact {
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+main.build div.items div#pending_item section.artifact:hover {
+	background-color: #222;
+}
 
 footer {
 	text-align: center;
