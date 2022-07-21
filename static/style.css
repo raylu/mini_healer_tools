@@ -2,15 +2,10 @@
 	box-sizing: border-box;
 }
 
-@font-face {
-	font-family: 'Mini Healer';
-	src: url('/static/fonts/indienovaBC-Regular-12px.ttf');
-}
-
 body {
 	background-color: #000;
 	color: #aaa;
-	font: 18px 'Mini Healer';
+	font: 18px monospace;
 }
 
 a:link, a:visited, a:active {
