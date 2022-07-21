@@ -35,9 +35,9 @@ def artifact(request, key):
 		raise HTTPException(404, '%r not found\n' % key)
 
 	if 'ArtifactName' in data:
-		data['ArtifactName'] = strings[data['ArtifactName']]
+		data['ArtifactName'] = _resolve_string(data['ArtifactName'])
 	if 'specialDesc' in data:
-		data['specialDesc'] = strings[data['specialDesc']]
+		data['specialDesc'] = _resolve_string(data['specialDesc'])
 		data['strings'] = _fetch_strings(data['specialDesc'])
 	return Response.json(data)
 
@@ -52,7 +52,7 @@ def static(request, path):
 	except FileNotFoundError:
 		raise HTTPException(404, '%r not found\n' % path)
 
-def _fetch_strings(s):
+def _fetch_strings(s: str) -> dict[str, str]:
 	extra_strings = {}
 	for m in re.finditer(r'\[(\S+)\]', s):
 		var = m.group(1)
@@ -61,6 +61,12 @@ def _fetch_strings(s):
 		except KeyError:
 			pass
 	return extra_strings
+
+def _resolve_string(s: str) -> str:
+	name = strings[s]
+	if name[0] == '[' and name[-1] == ']':
+		name = strings[name[1:-1]]
+	return name
 
 routes = [
 	('GET', '/', root),
@@ -93,7 +99,7 @@ def main():
 		artifact_names = collections.defaultdict(list)
 		for artifact in artifact_data:
 			try:
-				name = strings[artifact['ArtifactName']]
+				name = _resolve_string(artifact['ArtifactName'])
 			except KeyError:
 				continue
 			artifacts[artifact['Key']] = artifact
