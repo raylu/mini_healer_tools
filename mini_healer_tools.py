@@ -86,14 +86,16 @@ def main():
 	global artifacts, strings, artifact_names, talents
 	strings = {}
 	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
-		with open('extracted/' + filename, 'r', encoding='utf-8') as f:
+		path = 'extracted/ExportedProject/Assets/Resources/local/en_us/%s.txt' % filename
+		with open(path, 'r', encoding='utf-8') as f:
 			for line in f:
 				if line == '\n' or line == 'END':
 					continue
 				key, value = line.rstrip('\n').split('=', 1)
 				assert key not in strings
 				strings[key] = value
-	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
+	with open('extracted/ExportedProject/Assets/Resources/gamedata/artifact/ArtifactData.json',
+			'r', encoding='utf-8') as f:
 		artifact_data = json.load(f)['Artifacts']
 		artifacts = {}
 		artifact_names = collections.defaultdict(list)
@@ -104,7 +106,8 @@ def main():
 				continue
 			artifacts[artifact['Key']] = artifact
 			artifact_names[name].append(artifact['Key'])
-	with open('extracted/TalentData', 'r', encoding='utf-8') as f:
+	with open('extracted/ExportedProject/Assets/Resources/gamedata/talent/TalentData.json',
+			'r', encoding='utf-8') as f:
 		talent_data = json.load(f)['Talents']
 		talent_dict = {}
 		talent_strings = {}
