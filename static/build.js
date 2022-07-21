@@ -24,6 +24,9 @@
 	header.appendChild(document.createElement('h2'));
 	header.children[4].innerText = 'Items';
 	header.children[4].addEventListener('click', showItems);
+	const artifacts = new Artifacts();
+	await artifacts.fetchArtifactNames();
+	artifacts.setupSearch(artifactsCB);
 
 	function parseURL() {
 		let selectedTalents = {};
@@ -134,6 +137,17 @@
 	function showItems() {
 		main.innerHTML = '';
 		main.appendChild(items);
+	}
+
+	function artifactsCB(keys, name) {
+		const pendingItem = document.querySelector('main .items #pending_item');
+		pendingItem.innerHTML = '';
+		for (const key of keys) {
+			const section = document.createElement('section');
+			section.classList.add('artifact');
+			artifacts.load(key, section);
+			pendingItem.appendChild(section);
+		}
 	}
 
 	showTree(0);

@@ -24,6 +24,7 @@ a:hover {
 form#search {
 	margin: 25px auto;
 	width: 250px;
+	position: relative; /* for div#results */
 }
 form#search input {
 	background-color: #111;
@@ -33,7 +34,7 @@ form#search input {
 }
 form#search div#results {
 	position: absolute;
-	top: 50px;
+	top: 20px;
 	max-height: 300px;
 	overflow-y: scroll;
 	width: 250px;
@@ -65,19 +66,19 @@ main.root {
 	justify-content: space-evenly;
 }
 
-main.artifacts {
+main.artifacts, div#pending_item {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-evenly;
 }
-main.artifacts section div.type {
+main section.artifact div.type {
 	color: #777;
 	margin-bottom: 1em;
 }
-main.artifacts section div.desc {
+main section.artifact div.desc {
 	margin-bottom: 1em;
 }
-main.artifacts section div.props {
+main section.artifact div.props {
 	color: #777;
 }
 

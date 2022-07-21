@@ -5,10 +5,17 @@
 <main class="build">
 	<div class="tree"></div>
 	<div class="info"></div>
-	<div class="items"></div>
+	<div class="items">
+		<form id="search">
+			<input type="text" name="q" autocomplete="off">
+			<div id="results"></div>
+		</form>
+		<div id="pending_item"></div>
+	</div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@jsonurl/jsonurl@1.1.6/dist/jsonurl.min.js"
 	integrity="sha256-4+ssSqCkuDc9UPEY8zOLzzBuY8QnbZdhrqbIDfYlsCY=" crossorigin="anonymous"></script>
+<script src="/static/artifacts.js"></script>
 <script src="/static/build.js"></script>
 {% endblock body %}

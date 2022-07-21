@@ -144,8 +144,9 @@ class Artifacts {
 		main.innerHTML = '';
 		for (const key of keys) {
 			const section = document.createElement('section');
-			main.appendChild(section);
+			section.classList.add('artifact');
 			artifacts.load(key, section);
+			main.appendChild(section);
 		}
 	}
 })();
