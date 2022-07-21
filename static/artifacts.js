@@ -55,6 +55,7 @@ class Artifacts {
 
 		const results = document.querySelector('div#results');
 		results.addEventListener('click', (event) => {
+			results.classList.remove('visible');
 			results.innerHTML = '';
 			const dataset = event.target.dataset;
 			const keys = dataset.keys.split(',');
@@ -76,6 +77,7 @@ class Artifacts {
 				results.appendChild(result);
 			}
 		}
+		results.classList.add('visible');
 	}
 
 	async load(key, section) {

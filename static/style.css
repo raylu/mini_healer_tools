@@ -26,16 +26,26 @@ form#search input {
 	color: inherit;
 	border: 1px solid #222;
 	width: 100%;
+	font: inherit;
 }
 form#search div#results {
+	display: none;
 	position: absolute;
-	top: 20px;
 	max-height: 300px;
 	overflow-y: scroll;
 	width: 250px;
+	padding: 6px 10px;
 	background-color: #222;
 	border: 1px solid #111;
+}
+form#search div#results.visible {
+	display: block;
+}
+form#search div#results div.result {
 	cursor: pointer;
+}
+form#search div#results div.result:hover {
+	background-color: #333;
 }
 
 main, header {
