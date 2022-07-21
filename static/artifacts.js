@@ -5,32 +5,36 @@ class Artifacts {
 		this.artifactNames = null;
 		this.searchTimeout = null;
 
-		this.slots = {
-			0: {
-				0: 'Axe',
-				1: 'Sword',
-				2: 'Wand',
-				3: 'Bow',
-				9: 'Dagger',
-				14: 'Staff',
-				15: 'Hammer',
-			},
-			1: {
-				4: 'Shield',
-				5: 'Body Armor',
-				6: 'Helm',
-				7: 'Glove',
-				17: 'Boot',
-				19: 'Pants',
-			},
-			2: {
-				8: 'Relic',
-				11: 'Arrow',
-				12: 'Ring',
-				13: 'Amulet',
-			},
+		this.types = {
+			// slot 0
+			0: 'Axe',
+			1: 'Sword',
+			2: 'Wand',
+			3: 'Bow',
+			9: 'Dagger',
+			10: 'Claw',
+			14: 'Staff',
+			15: 'Hammer',
+			// slot 1
+			4: 'Shield',
+			5: 'Body Armor',
+			6: 'Helm',
+			7: 'Glove',
+			17: 'Boot',
+			19: 'Pants',
+			// slot 2
+			8: 'Relic',
+			11: 'Arrow',
+			12: 'Ring',
+			13: 'Amulet',
+			// special
+			16: 'Belt',
+			20: 'Map',
 		}
 		this.rarities = {
+			0: 'Uncommon',
+			1: 'Rare',
+			2: 'Epic',
 			3: 'Unique',
 		}
 	}
@@ -84,7 +88,7 @@ class Artifacts {
 
 		const type = document.createElement('div');
 		const types = [
-			this.slots[artifact['SlotType']][artifact['Type']],
+			this.types[artifact['Type']],
 		];
 		if (artifact['Rarity']) types.push(this.rarities[artifact['Rarity']]);
 		if (artifact['isUltraRare']) types.push('Ultra Rare');
