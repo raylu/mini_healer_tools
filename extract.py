@@ -16,6 +16,14 @@ def main():
 
 	subprocess.run([asset_ripper_path, 'raw/', '-o' 'extracted'], check=True)
 
+	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
+		path = 'extracted/ExportedProject/Assets/Resources/local/en_us/%s.txt' % filename
+		os.link(path, 'extracted/' + filename)
+	os.link('extracted/ExportedProject/Assets/Resources/gamedata/artifact/ArtifactData.json',
+			'extracted/ArtifactData')
+	os.link('extracted/ExportedProject/Assets/Resources/gamedata/talent/TalentData.json',
+			'extracted/TalentData')
+
 	url = 'https://gitlab.com/ezrast/mini-builder/-/raw/main/scripts/talent_fixups.json'
 	with urllib.request.urlopen(url) as r:
 		assert r.status == 200
@@ -24,8 +32,7 @@ def main():
 	with open('extracted/talent_fixups.json', 'r', encoding='utf-8') as f:
 		talent_fixups = json.load(f)
 
-	with open('extracted/ExportedProject/Assets/Resources/local/en_us/TALENT.txt',
-			'r', encoding='utf-8') as f:
+	with open('extracted/TALENT', 'r', encoding='utf-8') as f:
 		talent_strings: dict[str, str] = {}
 		for line in f:
 			if line == '\n' or line == 'END':
@@ -33,8 +40,7 @@ def main():
 			key, value = line.rstrip('\n').split('=', 1)
 			assert key not in talent_strings
 			talent_strings[key] = value
-	with open('extracted/ExportedProject/Assets/Resources/gamedata/talent/TalentData.json',
-			'r', encoding='utf-8') as f:
+	with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 		talent_data = json.load(f)['Talents']
 
 	try:
