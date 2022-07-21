@@ -5,7 +5,7 @@
 		return await res.json();
 	}
 	const talents = await fetchTalents();
-	const selectedTalents = parseURL();
+	const build = parseURL();
 
 	const header = document.querySelector('header');
 	const classes = {
@@ -29,12 +29,17 @@
 	artifacts.setupSearch(artifactsCB);
 
 	function parseURL() {
-		let selectedTalents = {};
+		let parsedBuild = {
+			'talents': {},
+			'items': [],
+		};
 		if (location.search.substr(0, 3) === '?s=') {
-			const build = JsonURL.parse(location.search.substr(3), {AQF: true});
-			selectedTalents = build['talents'];
+			parsedBuild = JsonURL.parse(location.search.substr(3), {AQF: true});
 		}
-		return selectedTalents;
+		return parsedBuild;
+	}
+	function updateURL(buildData) {
+		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify(buildData, {AQF: true}));
 	}
 
 	const main = document.querySelector('main');
@@ -58,7 +63,7 @@
 			img.src = `/static/talents/${talent['Key']}.png`
 			talentDiv.appendChild(img);
 
-			const points = selectedTalents[talentUrlKey(talent)] || 0;
+			const points = build['talents'][talentUrlKey(talent)] || 0;
 			talentDiv.append(points);
 
 			tree.appendChild(talentDiv);
@@ -84,6 +89,7 @@
 		showTalentInfo(talent);
 
 		const urlKey = talentUrlKey(talent);
+		const selectedTalents = build['talents'];
 		let points = selectedTalents[urlKey] || 0;
 		if (incr) {
 			if (points < talent['maxLevel'])
@@ -98,7 +104,7 @@
 			delete selectedTalents[urlKey];
 
 		target.childNodes[1].textContent = points;
-		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify({'talents': selectedTalents}, {AQF: true}));
+		updateURL(build);
 	}
 
 	function talentUrlKey(talent) {
@@ -134,18 +140,29 @@
 		info.appendChild(extra);
 	}
 
+	const pendingItem = document.querySelector('main .items #pending_item');
+	const selectedItems = document.querySelector('main .items #selected_items');
 	function showItems() {
+		if (selectedItems.childElementCount === 0) {
+			// this may be the first time we're showing items
+			for (const key of build['items']) {
+				const section = document.createElement('section');
+				section.classList.add('artifact');
+				artifacts.load(key, section);
+				selectedItems.appendChild(section);
+			}
+		}
+
 		main.innerHTML = '';
 		main.appendChild(items);
 	}
 
-	const pendingItem = document.querySelector('main .items #pending_item');
-	const selectedItems = document.querySelector('main .items #selected_items');
 	function artifactsCB(keys, name) {
 		pendingItem.innerHTML = '';
 		for (const key of keys) {
 			const section = document.createElement('section');
 			section.classList.add('artifact');
+			section.dataset['key'] = key;
 			artifacts.load(key, section);
 			pendingItem.appendChild(section);
 		}
@@ -165,6 +182,10 @@
 
 		pendingItem.innerHTML = '';
 		selectedItems.appendChild(target);
+
+		const key = target.dataset['key'];
+		build['items'].push(key);
+		updateURL(build);
 	});
 
 	showTree(0);
