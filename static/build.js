@@ -148,8 +148,9 @@
 			for (const key of build['items']) {
 				const section = document.createElement('section');
 				section.classList.add('artifact');
+				section.dataset['key'] = key;
 				artifacts.load(key, section);
-				selectedItems.appendChild(section);
+				renderSelectedItem(section);
 			}
 		}
 
@@ -181,10 +182,29 @@
 		if (!found) return;
 
 		pendingItem.innerHTML = '';
-		selectedItems.appendChild(target);
+		renderSelectedItem(target);
 
 		const key = target.dataset['key'];
 		build['items'].push(key);
+		updateURL(build);
+	});
+
+	function renderSelectedItem(element) {
+		const deleteDiv = document.createElement('div');
+		deleteDiv.classList.add('delete');
+		deleteDiv.innerHTML = '✖';
+		element.appendChild(deleteDiv);
+		selectedItems.appendChild(element);
+	}
+
+	selectedItems.addEventListener('click', (event) => {
+		if (event.target.tagName !== 'DIV' || !event.target.classList.contains('delete'))
+			return;
+
+		const section = event.target.parentElement;
+		section.remove();
+
+		build['items'] = build['items'].filter(key => key !== section.dataset['key']);
 		updateURL(build);
 	});
 

@@ -121,6 +121,16 @@ main.build div.info div.desc {
 	margin-bottom: 1em;
 }
 
+main.build div.items div#selected_items section.artifact {
+	position: relative; /* for div.delete */
+}
+main.build div.items div#selected_items section.artifact div.delete {
+    position: absolute;
+	top: 10px;
+	right: 10px;
+	cursor: pointer;
+}
+
 main.build div.items div#pending_item section.artifact {
 	cursor: pointer;
 	transition: background-color 0.2s;
