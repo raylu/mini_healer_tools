@@ -7,14 +7,13 @@ if len(sys.argv) == 3:
 	eventlet.monkey_patch()
 
 # pylint: disable=wrong-import-position
-import collections
 import copy
 import mimetypes
-import json
-import re
 
 from pigwig import PigWig, Response
 from pigwig.exceptions import HTTPException
+
+import game_data
 
 def root(request):
 	return Response.render(request, 'index.jinja2', {})
@@ -26,23 +25,23 @@ def build_page(request, name=None):
 	return Response.render(request, 'build.jinja2', {})
 
 def get_artifact_names(request):
-	return Response.json(artifact_names)
+	return Response.json(data.artifact_names)
 
 def get_artifact(request, key):
 	try:
-		data = copy.copy(artifacts[key])
+		artifact = copy.copy(data.artifacts[key])
 	except KeyError:
 		raise HTTPException(404, '%r not found\n' % key) # pylint: disable=raise-missing-from
 
-	if 'ArtifactName' in data:
-		data['ArtifactName'] = _resolve_string(data['ArtifactName'])
-	if 'specialDesc' in data:
-		data['specialDesc'] = _resolve_string(data['specialDesc'])
-		data['strings'] = _fetch_strings(data['specialDesc'])
-	return Response.json(data)
+	if 'ArtifactName' in artifact:
+		artifact['ArtifactName'] = data.resolve_string(artifact['ArtifactName'])
+	if 'specialDesc' in artifact:
+		artifact['specialDesc'] = data.resolve_string(artifact['specialDesc'])
+		artifact['strings'] = data.fetch_strings(artifact['specialDesc'])
+	return Response.json(artifact)
 
 def get_talents(request):
-	return Response.json(talents)
+	return Response.json(data.talents)
 
 def static(request, path):
 	content_type, _ = mimetypes.guess_type(path)
@@ -51,22 +50,6 @@ def static(request, path):
 			return Response(f.read(), content_type=content_type)
 	except FileNotFoundError:
 		raise HTTPException(404, '%r not found\n' % path) # pylint: disable=raise-missing-from
-
-def _fetch_strings(s: str) -> dict[str, str]:
-	extra_strings = {}
-	for m in re.finditer(r'\[(\S+)\]', s):
-		var = m.group(1)
-		try:
-			extra_strings[var] = strings[var]
-		except KeyError:
-			pass
-	return extra_strings
-
-def _resolve_string(s: str) -> str:
-	name = strings[s]
-	if re.match(r'\[[A-Z_]+\]', name):
-		name = strings[name[1:-1]]
-	return name
 
 routes = [
 	('GET', '/', root),
@@ -80,46 +63,9 @@ routes = [
 ]
 
 app = PigWig(routes, template_dir='html')
-artifacts = strings = artifact_names = talents = None
+data = game_data.GameData()
 
 def main():
-	global artifacts, strings, artifact_names, talents
-	strings = {}
-	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
-		with open('extracted/' + filename, 'r', encoding='utf-8') as f:
-			for line in f:
-				if line in ('\n', 'END'):
-					continue
-				key, value = line.rstrip('\n').split('=', 1)
-				assert key not in strings
-				strings[key] = value
-	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
-		artifact_data = json.load(f)['Artifacts']
-		artifacts = {}
-		artifact_names = collections.defaultdict(list)
-		for artifact in artifact_data:
-			try:
-				name = _resolve_string(artifact['ArtifactName'])
-			except KeyError:
-				continue
-			artifacts[artifact['Key']] = artifact
-			artifact_names[name].append(artifact['Key'])
-	with open('extracted/TalentData', 'r', encoding='utf-8') as f:
-		talent_data = json.load(f)['Talents']
-		talent_dict = {}
-		talent_strings = {}
-		for talent in talent_data:
-			try:
-				talent['TalentName'] = strings[talent['TalentName']]
-			except KeyError:
-				continue
-			key = talent['Key']
-			talent['desc'] = strings.get('TALENT_%s_DESC' % key)
-			if talent['desc'] is not None:
-				talent_strings.update(_fetch_strings(talent['desc']))
-			talent_dict[key] = talent
-		talents = {'talents': talent_dict, 'strings': talent_strings}
-
 	if len(sys.argv) == 3:
 		addr = sys.argv[1]
 		port = int(sys.argv[2])

@@ -353,6 +353,7 @@ disable = [
 	"global-statement",
 	"invalid-name",
 	"locally-disabled",
+	"missing-class-docstring",
 	"missing-module-docstring",
 	"missing-function-docstring",
 	"raw-checker-failed",

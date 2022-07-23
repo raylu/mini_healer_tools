@@ -1,4 +1,5 @@
 /.vscode/launch.json
+/__pycache__/
 /extracted/
 /raw
 /static/talents/
