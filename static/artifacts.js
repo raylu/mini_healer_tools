@@ -62,10 +62,11 @@ class Artifacts {
 			resultsCB(keys, dataset.name);
 		});
 
-		document.querySelector('form#search').addEventListener('blur', (event) => {
+		searchInput.addEventListener('blur', (event) => {
 			if (this.searchTimeout !== null)
 				clearTimeout(this.searchTimeout);
-			results.classList.remove('visible');
+			// wait long enough to allow clicks on results
+			setTimeout(() => results.classList.remove('visible'), 100);
 		});
 	}
 
