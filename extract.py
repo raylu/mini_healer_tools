@@ -34,7 +34,25 @@ def main():
 	os.link('extracted/ExportedProject/Assets/Texture2D/Wisdom Tomes.png',
 			'static/favicon.png')
 
+	extract_artifacts()
 	extract_talents()
+
+def extract_artifacts():
+	try:
+		os.mkdir('static/artifacts')
+	except FileExistsError:
+		pass
+
+	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
+		artifact_data = json.load(f)['Artifacts']
+
+	for artifact in artifact_data:
+		key = artifact['Key']
+		try:
+			os.link('extracted/ExportedProject/Assets/Resources/image/artifacts/%s.png' % key,
+					'static/artifacts/%s.png' % key)
+		except FileNotFoundError:
+			pass
 
 def extract_talents():
 	url = 'https://gitlab.com/ezrast/mini-builder/-/raw/main/scripts/talent_fixups.json'

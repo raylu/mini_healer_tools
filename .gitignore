@@ -2,5 +2,6 @@
 /__pycache__/
 /extracted/
 /raw
+/static/artifacts/
 /static/talents/
 /static/favicon.png

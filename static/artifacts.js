@@ -84,6 +84,10 @@ class Artifacts {
 		const res = await fetch('/data/artifact/' + key);
 		const artifact = await res.json();
 
+		const icon = document.createElement('img');
+		icon.src = `/static/artifacts/${artifact['Key']}.png`;
+		section.appendChild(icon);
+
 		const name = document.createElement('h2');
 		name.innerText = artifact['ArtifactName'];
 		section.appendChild(name);

@@ -544,5 +544,6 @@ blank_lines_around_top_level_definition = 1
 blank_lines_between_top_level_imports_and_variables = 1
 column_limit = 120
 continuation_align_style = "FIXED"
+continuation_indent_width = 8
 spaces_before_comment = 1
 use_tabs = true
