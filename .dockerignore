@@ -1,4 +1,5 @@
 .git
+.vscode
 raw
 extracted/AuxiliaryFiles
 extracted/ExportedProject
