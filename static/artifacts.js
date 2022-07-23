@@ -61,16 +61,24 @@ class Artifacts {
 			const keys = dataset.keys.split(',');
 			resultsCB(keys, dataset.name);
 		});
+
+		document.querySelector('form#search').addEventListener('blur', (event) => {
+			if (this.searchTimeout !== null)
+				clearTimeout(this.searchTimeout);
+			results.classList.remove('visible');
+		});
 	}
 
 	search(q) {
 		const results = document.querySelector('div#results');
 		results.innerHTML = '';
 		q = q.toLowerCase();
-		for (const [name, keys] of Object.entries(this.artifactNames)) {
+		for (const [name, {keys, rarity}] of Object.entries(this.artifactNames)) {
 			if (name.toLowerCase().indexOf(q) !== -1) {
 				const result = document.createElement('div');
 				result.classList.add('result');
+				if (this.rarities[rarity])
+					result.classList.add(this.rarities[rarity].toLowerCase());
 				result.innerText = name;
 				result.dataset.name = name;
 				result.dataset.keys = keys;
@@ -143,7 +151,7 @@ class Artifacts {
 
 	if (window.location.pathname.substr(0, 11) === '/artifacts/') {
 		const name = decodeURIComponent(window.location.pathname.substr(11));
-		loadKeys(artifacts.artifactNames[name]);
+		loadKeys(artifacts.artifactNames[name]['keys']);
 		const searchInput = document.querySelector('form#search input[name=q]');
 		searchInput.value = name;
 	}

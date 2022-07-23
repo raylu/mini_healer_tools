@@ -40,12 +40,25 @@ form#search div#results {
 	padding: 6px 10px;
 	background-color: #222;
 	border: 1px solid #111;
+	z-index: 1;
 }
 form#search div#results.visible {
 	display: block;
 }
 form#search div#results div.result {
 	cursor: pointer;
+}
+form#search div#results div.result.uncommon {
+	color: #5e9d50;
+}
+form#search div#results div.result.rare {
+	color: #788eb8;
+}
+form#search div#results div.result.epic {
+	color: #b272c2;
+}
+form#search div#results div.result.unique {
+	color: #9e7c2e;
 }
 form#search div#results div.result:hover {
 	background-color: #333;
@@ -92,6 +105,15 @@ main section.artifact h2 {
 	margin: 0 0 0.5em;
 	text-align: center;
 }
+main section.artifact h2.uncommon {
+	color: #5e9d50;
+}
+main section.artifact h2.rare {
+	color: #788eb8;
+}
+main section.artifact h2.epic {
+	color: #b272c2;
+}
 main section.artifact h2.unique {
 	color: #9e7c2e;
 }
@@ -99,8 +121,17 @@ main section.artifact div.icon > img {
 	width: 64px;
 	height: 64px;
 }
+main section.artifact div.icon > img.uncommon {
+	filter: hue-rotate(-190deg) saturate(2) brightness(0.8);
+}
+main section.artifact div.icon > img.rare {
+	filter: hue-rotate(-69deg) saturate(2) brightness(0.8);
+}
+main section.artifact div.icon > img.epic {
+	filter: hue-rotate(-14deg) saturate(3) brightness(0.8);
+}
 main section.artifact div.icon > img.unique {
-	filter: hue-rotate(52deg) saturate(2) brightness(0.8);
+	filter: hue-rotate(75deg) saturate(2) brightness(0.8);
 }
 main section.artifact div.type {
 	margin-bottom: 1em;

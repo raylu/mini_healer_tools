@@ -12,15 +12,16 @@ class TalentClass(enum.IntEnum):
 
 class GameData:
 	def __init__(self):
-		self.strings = {}
-		self.artifacts = {}
-		self.artifact_names = collections.defaultdict(list)
+		self.strings: dict[str, str] = {}
+		self.artifacts: dict[str, dict] = {}
+		self.artifact_names: dict[str, dict] = {}
 		self.talents: dict = None
 
 		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 			with open('extracted/' + filename, 'r', encoding='utf-8') as f:
 				self.strings.update(parse_translation(f))
 
+		artifact_name_to_keys = collections.defaultdict(list)
 		with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 			artifact_data = json.load(f)['Artifacts']
 			for artifact in artifact_data:
@@ -29,7 +30,11 @@ class GameData:
 				except KeyError:
 					continue
 				self.artifacts[artifact['Key']] = artifact
-				self.artifact_names[name].append(artifact['Key'])
+				artifact_name_to_keys[name].append(artifact['Key'])
+		for name, keys in artifact_name_to_keys.items():
+			rarities = {self.artifacts[key].get('Rarity') for key in keys}
+			(rarity,) = rarities
+			self.artifact_names[name] = {'keys': keys, 'rarity': rarity}
 
 		with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 			talent_data = json.load(f)['Talents']
