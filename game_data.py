@@ -52,10 +52,10 @@ class GameData:
 			self.talents = {'talents': talent_dict, 'strings': talent_strings}
 
 	def resolve_string(self, s: str) -> str:
-		name = self.strings[s]
-		if re.match(r'\[[A-Z_]+\]', name):
-			name = self.strings[name[1:-1]]
-		return name
+		value = self.strings[s]
+		if re.fullmatch(r'\[[A-Z_]+\]', value):
+			value = self.strings[value[1:-1]]
+		return value
 
 	def fetch_strings(self, s: str) -> dict[str, str]:
 		extra_strings = {}
