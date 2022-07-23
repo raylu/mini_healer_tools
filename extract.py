@@ -14,7 +14,7 @@ def main():
 	except FileExistsError:
 		pass
 
-	subprocess.run([asset_ripper_path, 'raw/', '-o' 'extracted'], check=True)
+	subprocess.run([asset_ripper_path, 'raw/', '-o', 'extracted'], check=True)
 
 	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 		path = 'extracted/ExportedProject/Assets/Resources/local/en_us/%s.txt' % filename
@@ -35,7 +35,7 @@ def main():
 	with open('extracted/TALENT', 'r', encoding='utf-8') as f:
 		talent_strings: dict[str, str] = {}
 		for line in f:
-			if line == '\n' or line == 'END':
+			if line in ('\n', 'END'):
 				continue
 			key, value = line.rstrip('\n').split('=', 1)
 			assert key not in talent_strings

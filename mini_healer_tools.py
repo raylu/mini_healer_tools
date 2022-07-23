@@ -28,11 +28,11 @@ def build_page(request, name=None):
 def get_artifact_names(request):
 	return Response.json(artifact_names)
 
-def artifact(request, key):
+def get_artifact(request, key):
 	try:
 		data = copy.copy(artifacts[key])
 	except KeyError:
-		raise HTTPException(404, '%r not found\n' % key)
+		raise HTTPException(404, '%r not found\n' % key) # pylint: disable=raise-missing-from
 
 	if 'ArtifactName' in data:
 		data['ArtifactName'] = _resolve_string(data['ArtifactName'])
@@ -50,7 +50,7 @@ def static(request, path):
 		with open('static/' + path, 'rb') as f:
 			return Response(f.read(), content_type=content_type)
 	except FileNotFoundError:
-		raise HTTPException(404, '%r not found\n' % path)
+		raise HTTPException(404, '%r not found\n' % path) # pylint: disable=raise-missing-from
 
 def _fetch_strings(s: str) -> dict[str, str]:
 	extra_strings = {}
@@ -74,7 +74,7 @@ routes = [
 	('GET', '/artifacts/<name>', artifacts_page),
 	('GET', '/build', build_page),
 	('GET', '/data/artifact_names', get_artifact_names),
-	('GET', '/data/artifact/<key>', artifact),
+	('GET', '/data/artifact/<key>', get_artifact),
 	('GET', '/data/talents', get_talents),
 	('GET', '/static/<path:path>', static),
 ]
@@ -88,7 +88,7 @@ def main():
 	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 		with open('extracted/' + filename, 'r', encoding='utf-8') as f:
 			for line in f:
-				if line == '\n' or line == 'END':
+				if line in ('\n', 'END'):
 					continue
 				key, value = line.rstrip('\n').split('=', 1)
 				assert key not in strings
