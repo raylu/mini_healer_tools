@@ -2,3 +2,4 @@ eventlet
 jinja2
 pigwig
 pillow
+pyyaml

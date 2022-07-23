@@ -8,6 +8,7 @@ import sys
 import urllib.request
 
 import PIL.Image
+import yaml
 
 import game_data
 
@@ -46,9 +47,49 @@ def extract_artifacts():
 	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 		artifact_data = json.load(f)['Artifacts']
 
+	image_guids: dict[str, str] = {}
+	texture_dir = 'extracted/ExportedProject/Assets/Texture2D/'
+	for filename in os.listdir(texture_dir):
+		if not filename.endswith('.png.meta'):
+			continue
+		with open(texture_dir + filename, 'r', encoding='utf-8') as f:
+			assert f.readline() == 'fileFormatVersion: 2\n'
+			guid_line = f.readline()
+			assert guid_line.startswith('guid: ')
+			guid = guid_line[len('guid: '):-1]
+		image_guids[guid] = filename[:-len('.png.meta')]
+	with open('extracted/ExportedProject/Assets/Scene/0_0_welcome.unity', 'r', encoding='utf-8') as f:
+		for line in f:
+			if line.endswith('artifactData:\n'):
+				break
+		else:
+			raise Exception("couldn't find artifactData")
+		lines = ['MonoBehaviour:\n']
+		for line in f:
+			if line.startswith('---'):
+				break
+			elif line.startswith('    '):
+				continue
+			lines.append(line)
+	doc = yaml.safe_load(''.join(lines))
+	icon_filenames: dict[str, str] = {}
+	for k, v in doc['MonoBehaviour'].items():
+		if not k.endswith('Icon') or k == 'BleedIcon':
+			continue
+		assert v['fileID'] == 21300000 and v['type'] == 3, '%r: %r' % (k, v)
+		filename = image_guids.get(v['guid'])
+		if filename is not None:
+			icon_filenames[k[:-len('Icon')]] = filename
+
 	for artifact in artifact_data:
 		key: str = artifact['Key']
 		output_path = 'static/artifacts/%s.png' % key
+
+		filename = icon_filenames.get(pascal_case(key))
+		if filename is not None:
+			os.link(texture_dir + filename + '.png', output_path)
+			continue
+
 		if key == 'HOLLOWED_CORE_NORMAL': # this is the only item where the divine version isn't _DIVINE
 			key = 'HOLLOWED_CORE'
 		elif key in ('WISPERWIND', 'WISPERWIND_DIVINE'):
@@ -73,18 +114,21 @@ INPUT_DIRS = [
 def link_artifact_icon(key: str, output_path: str) -> bool:
 	for input_dir in INPUT_DIRS:
 		try:
-			os.link(input_dir + '%s.png' % key, output_path)
+			os.link(input_dir + key + '.png', output_path)
 		except FileNotFoundError:
 			pass
 		else:
 			return True
-	pascal_case_key = ''.join(part.capitalize() for part in key.split('_')) # IQSIOR_CAPE → IqsiorCape
 	try:
-		os.link('extracted/ExportedProject/Assets/Texture2D/%s.png' % pascal_case_key, output_path)
+		os.link('extracted/ExportedProject/Assets/Texture2D/%s.png' % pascal_case(key), output_path)
 	except FileNotFoundError:
 		return False
 	else:
 		return True
+
+def pascal_case(s: str) -> str:
+	"""IQSIOR_CAPE → IqsiorCape"""
+	return ''.join(part.capitalize() for part in s.split('_'))
 
 def extract_talents():
 	url = 'https://gitlab.com/ezrast/mini-builder/-/raw/main/scripts/talent_fixups.json'
