@@ -27,6 +27,8 @@ def main():
 			'extracted/ArtifactData')
 	os.link('extracted/ExportedProject/Assets/Resources/gamedata/talent/TalentData.json',
 			'extracted/TalentData')
+	os.link('extracted/ExportedProject/Assets/Resources/fonts/raw/indienovaBC-Regular-12px.ttf',
+			'extracted/indienovaBC-Regular-12px.ttf')
 
 	url = 'https://gitlab.com/ezrast/mini-builder/-/raw/main/scripts/talent_fixups.json'
 	with urllib.request.urlopen(url) as r:

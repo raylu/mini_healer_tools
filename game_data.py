@@ -1,6 +1,13 @@
 import collections
+import enum
 import json
 import re
+
+class TalentClass(enum.IntEnum):
+	DRUID = 0
+	PRIEST = 1
+	OCCULTIST = 2
+	PALADIN = 5
 
 class GameData:
 	def __init__(self):

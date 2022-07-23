@@ -32,8 +32,8 @@ def export_build(request):
 	field = body.read(len(expected))
 	assert field == expected, 'expected %r but got %r' % (expected, field)
 	build = json.loads(body.read(body_len - len(expected)))
-	export_image.export_build(data, build)
-	return Response('hi')
+	image_bytes = export_image.export_build(data, build)
+	return Response(image_bytes.getvalue(), content_type='image/webp')
 
 def get_artifact_names(request):
 	return Response.json(data.artifact_names)
