@@ -81,6 +81,10 @@ main.artifacts, div#pending_item, div#selected_items {
 	flex-wrap: wrap;
 	justify-content: space-evenly;
 }
+main section.artifact img.icon {
+	width: 64px;
+	height: 64px;
+}
 main section.artifact div.type {
 	color: #777;
 	margin-bottom: 1em;

@@ -86,6 +86,7 @@ class Artifacts {
 
 		const icon = document.createElement('img');
 		icon.src = `/static/artifacts/${artifact['Key']}.png`;
+		icon.classList.add('icon');
 		section.appendChild(icon);
 
 		const name = document.createElement('h2');

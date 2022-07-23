@@ -47,12 +47,32 @@ def extract_artifacts():
 		artifact_data = json.load(f)['Artifacts']
 
 	for artifact in artifact_data:
-		key = artifact['Key']
+		key: str = artifact['Key']
+		output_path = 'static/artifacts/%s.png' % key
+		if not link_artifact_icon(key, output_path):
+			if artifact.get('isDivine') and key != 'HOLLOWED_CORE':
+				assert key.endswith('_DIVINE'), '%r is divine' % key
+				link_artifact_icon(key[:-len('_DIVINE')], output_path), "couldn't find %r" % key
+
+INPUT_DIRS = [
+	'extracted/ExportedProject/Assets/Resources/image/artifacts/',
+	'extracted/ExportedProject/Assets/Texture2D/',
+]
+def link_artifact_icon(key: str, output_path: str) -> bool:
+	for input_dir in INPUT_DIRS:
 		try:
-			os.link('extracted/ExportedProject/Assets/Resources/image/artifacts/%s.png' % key,
-					'static/artifacts/%s.png' % key)
+			os.link(input_dir + '%s.png' % key, output_path)
 		except FileNotFoundError:
 			pass
+		else:
+			return True
+	pascal_case_key = ''.join(part.capitalize() for part in key.split('_')) # IQSIOR_CAPE → IqsiorCape
+	try:
+		os.link('extracted/ExportedProject/Assets/Texture2D/%s.png' % pascal_case_key, output_path)
+	except FileNotFoundError:
+		return False
+	else:
+		return True
 
 def extract_talents():
 	url = 'https://gitlab.com/ezrast/mini-builder/-/raw/main/scripts/talent_fixups.json'
