@@ -90,7 +90,7 @@ def extract_artifacts():
 	doc = yaml.safe_load(''.join(lines))
 	icon_filenames: dict[str, str] = {} # "SimpleShiledIcon": Resources/image/artifacts/SIMPLESHIELD.png
 	for k, v in doc['MonoBehaviour'].items():
-		if not k.endswith('Icon') or k == 'BleedIcon':
+		if (not k.endswith('Icon') and not k.endswith('icon')) or k == 'BleedIcon':
 			continue
 		assert v['fileID'] == 21300000 and v['type'] == 3, '%r: %r' % (k, v)
 		filepath = image_guids.get(v['guid'])
@@ -105,6 +105,10 @@ def extract_artifacts():
 			key = 'HOLLOWED_CORE'
 		elif key in ('WISPERWIND', 'WISPERWIND_DIVINE'):
 			key = 'WIND_WISPER'
+		elif key in ('TOLMON_CRUELTY_N', 'TOLMON_CRUELTY_B'):
+			key = 'TOLMONCRUELTY'
+		elif key.endswith('_TOWER') and key != 'TRANQUIL_SPHERE_TOWER': # only tower item in ArtifactDataController.cs
+			key = key[:-len('_TOWER')]
 
 		try:
 			filename = icon_filenames[icon_names[key]]
