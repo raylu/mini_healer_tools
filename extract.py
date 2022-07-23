@@ -3,6 +3,7 @@
 import json
 import os
 import os.path
+import re
 import subprocess
 import sys
 import urllib.request
@@ -11,6 +12,8 @@ import PIL.Image
 import yaml
 
 import game_data
+
+ASSETS_DIR = 'extracted/ExportedProject/Assets/'
 
 def main():
 	asset_ripper_path = sys.argv[1]
@@ -26,13 +29,13 @@ def main():
 	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 		path = 'extracted/ExportedProject/Assets/Resources/local/en_us/%s.txt' % filename
 		os.link(path, 'extracted/' + filename)
-	os.link('extracted/ExportedProject/Assets/Resources/gamedata/artifact/ArtifactData.json',
+	os.link(ASSETS_DIR + 'Resources/gamedata/artifact/ArtifactData.json',
 			'extracted/ArtifactData')
-	os.link('extracted/ExportedProject/Assets/Resources/gamedata/talent/TalentData.json',
+	os.link(ASSETS_DIR + 'Resources/gamedata/talent/TalentData.json',
 			'extracted/TalentData')
-	os.link('extracted/ExportedProject/Assets/Resources/fonts/raw/indienovaBC-Regular-12px.ttf',
+	os.link(ASSETS_DIR + 'Resources/fonts/raw/indienovaBC-Regular-12px.ttf',
 			'extracted/indienovaBC-Regular-12px.ttf')
-	os.link('extracted/ExportedProject/Assets/Texture2D/Wisdom Tomes.png',
+	os.link(ASSETS_DIR + 'Texture2D/Wisdom Tomes.png',
 			'static/favicon.png')
 
 	extract_artifacts()
@@ -47,18 +50,31 @@ def extract_artifacts():
 	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 		artifact_data = json.load(f)['Artifacts']
 
-	image_guids: dict[str, str] = {}
-	texture_dir = 'extracted/ExportedProject/Assets/Texture2D/'
-	for filename in os.listdir(texture_dir):
-		if not filename.endswith('.png.meta'):
-			continue
-		with open(texture_dir + filename, 'r', encoding='utf-8') as f:
-			assert f.readline() == 'fileFormatVersion: 2\n'
-			guid_line = f.readline()
-			assert guid_line.startswith('guid: ')
-			guid = guid_line[len('guid: '):-1]
-		image_guids[guid] = filename[:-len('.png.meta')]
-	with open('extracted/ExportedProject/Assets/Scene/0_0_welcome.unity', 'r', encoding='utf-8') as f:
+	icon_names: dict[str, str] = {} # "SIMPLE_SHIELD": "SimpleShiledIcon"
+	with open(ASSETS_DIR + 'MonoScript/Assembly-CSharp/ArtifactDataController.cs', 'r', encoding='ascii') as f:
+		active_keys: list[str] = None
+		for line in f:
+			keys = [m.group(1) for m in re.finditer(r'artifact.Key == "([A-Z_]+)"', line)]
+			if keys:
+				active_keys = keys
+			else:
+				m = re.search(r'artifact.Icon = (\w+);', line)
+				if m:
+					for key in active_keys:
+						icon_names[key] = m.group(1)
+
+	image_guids: dict[str, str] = {} # "d599cf88e82d8c84ba650b2d80ab45d2": "Resources/image/artifacts/SIMPLESHIELD.png"
+	for image_dir in ['Texture2D/', 'Resources/image/artifacts/']:
+		for filename in os.listdir(ASSETS_DIR + image_dir):
+			if not filename.endswith('.png.meta'):
+				continue
+			with open(ASSETS_DIR + image_dir + filename, 'r', encoding='utf-8') as f:
+				assert f.readline() == 'fileFormatVersion: 2\n'
+				guid_line = f.readline()
+				assert guid_line.startswith('guid: ')
+				guid = guid_line[len('guid: '):-1]
+			image_guids[guid] = image_dir + filename[:-len('.meta')]
+	with open(ASSETS_DIR + 'Scene/0_0_welcome.unity', 'r', encoding='utf-8') as f:
 		for line in f:
 			if line.endswith('artifactData:\n'):
 				break
@@ -72,28 +88,32 @@ def extract_artifacts():
 				continue
 			lines.append(line)
 	doc = yaml.safe_load(''.join(lines))
-	icon_filenames: dict[str, str] = {}
+	icon_filenames: dict[str, str] = {} # "SimpleShiledIcon": Resources/image/artifacts/SIMPLESHIELD.png
 	for k, v in doc['MonoBehaviour'].items():
 		if not k.endswith('Icon') or k == 'BleedIcon':
 			continue
 		assert v['fileID'] == 21300000 and v['type'] == 3, '%r: %r' % (k, v)
-		filename = image_guids.get(v['guid'])
-		if filename is not None:
-			icon_filenames[k[:-len('Icon')]] = filename
+		filepath = image_guids.get(v['guid'])
+		if filepath is not None:
+			icon_filenames[k] = filepath
 
 	for artifact in artifact_data:
 		key: str = artifact['Key']
 		output_path = 'static/artifacts/%s.png' % key
 
-		filename = icon_filenames.get(pascal_case(key))
-		if filename is not None:
-			os.link(texture_dir + filename + '.png', output_path)
-			continue
-
 		if key == 'HOLLOWED_CORE_NORMAL': # this is the only item where the divine version isn't _DIVINE
 			key = 'HOLLOWED_CORE'
 		elif key in ('WISPERWIND', 'WISPERWIND_DIVINE'):
 			key = 'WIND_WISPER'
+
+		try:
+			filename = icon_filenames[icon_names[key]]
+		except KeyError:
+			pass
+		else:
+			os.link(ASSETS_DIR + filename, output_path)
+			continue
+
 		found = link_artifact_icon(key, output_path)
 		if not found:
 			if artifact.get('isDivine'):
@@ -108,8 +128,8 @@ def extract_artifacts():
 			print(key)
 
 INPUT_DIRS = [
-	'extracted/ExportedProject/Assets/Resources/image/artifacts/',
-	'extracted/ExportedProject/Assets/Texture2D/',
+	ASSETS_DIR + 'Resources/image/artifacts/',
+	ASSETS_DIR + 'Texture2D/',
 ]
 def link_artifact_icon(key: str, output_path: str) -> bool:
 	for input_dir in INPUT_DIRS:
@@ -120,7 +140,7 @@ def link_artifact_icon(key: str, output_path: str) -> bool:
 		else:
 			return True
 	try:
-		os.link('extracted/ExportedProject/Assets/Texture2D/%s.png' % pascal_case(key), output_path)
+		os.link(ASSETS_DIR + 'Texture2D/%s.png' % pascal_case(key), output_path)
 	except FileNotFoundError:
 		return False
 	else:
@@ -156,7 +176,7 @@ def extract_talents():
 		output_path = 'static/talents/%s.png' % talent['Key']
 		fixup = talent_fixups.get(name)
 		if fixup is None or 'iconPath' not in fixup:
-			os.link('extracted/ExportedProject/Assets/Resources/image/talents/%s.png' % talent['Key'], output_path)
+			os.link(ASSETS_DIR + 'Resources/image/talents/%s.png' % talent['Key'], output_path)
 		else:
 			icon_path = 'extracted/ExportedProject/' + fixup['iconPath']
 			crop = fixup.get('iconCrop')
