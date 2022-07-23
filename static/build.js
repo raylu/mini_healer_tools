@@ -66,6 +66,11 @@
 
 			const points = build['talents'][talentUrlKey(talent)] || 0;
 			talentDiv.append(points);
+			if (points > 0) {
+				talentDiv.classList.add('allocated');
+				if (points === talent['maxLevel'])
+					talentDiv.classList.add('maxed');
+			}
 
 			tree.appendChild(talentDiv);
 		}
@@ -99,10 +104,17 @@
 			if (points > 0)
 				points--;
 		}
-		if (points > 0)
+		if (points > 0) {
 			selectedTalents[urlKey] = points;
-		else
+			target.classList.add('allocated');
+			if (points === talent['maxLevel'])
+				target.classList.add('maxed');
+			else
+				target.classList.remove('maxed');
+		} else {
 			delete selectedTalents[urlKey];
+			target.classList.remove('allocated');
+		}
 
 		target.childNodes[1].textContent = points;
 		updateURL(build);

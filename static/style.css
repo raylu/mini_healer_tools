@@ -111,8 +111,16 @@ main.build div.tree .talent {
 	height: 90px;
 	width: 66px;
 	border: 1px solid #755;
+	line-height: 1;
 	text-align: center;
 	cursor: pointer;
+}
+main.build div.tree .talent.allocated {
+	background-color: #975;
+	color: #ddd;
+}
+main.build div.tree .talent.allocated.maxed {
+	background-color: #495;
 }
 main.build div.tree .talent img {
 	width: 64px;
