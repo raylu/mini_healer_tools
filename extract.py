@@ -49,10 +49,22 @@ def extract_artifacts():
 	for artifact in artifact_data:
 		key: str = artifact['Key']
 		output_path = 'static/artifacts/%s.png' % key
-		if not link_artifact_icon(key, output_path):
-			if artifact.get('isDivine') and key != 'HOLLOWED_CORE':
+		if key == 'HOLLOWED_CORE_NORMAL': # this is the only item where the divine version isn't _DIVINE
+			key = 'HOLLOWED_CORE'
+		elif key in ('WISPERWIND', 'WISPERWIND_DIVINE'):
+			key = 'WIND_WISPER'
+		found = link_artifact_icon(key, output_path)
+		if not found:
+			if artifact.get('isDivine'):
 				assert key.endswith('_DIVINE'), '%r is divine' % key
-				link_artifact_icon(key[:-len('_DIVINE')], output_path), "couldn't find %r" % key
+				key = key[:-len('_DIVINE')]
+			for anom_suffix in ('_N', '_B', '_I'):
+				if key.endswith(anom_suffix):
+					key = key[:-len(anom_suffix)]
+					break
+			found = link_artifact_icon(key, output_path)
+		if not found:
+			print(key)
 
 INPUT_DIRS = [
 	'extracted/ExportedProject/Assets/Resources/image/artifacts/',
