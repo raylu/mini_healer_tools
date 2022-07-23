@@ -2,9 +2,12 @@
 
 import json
 import os
+import os.path
 import subprocess
 import sys
 import urllib.request
+
+import PIL.Image
 
 def main():
 	asset_ripper_path = sys.argv[1]
@@ -14,7 +17,8 @@ def main():
 	except FileExistsError:
 		pass
 
-	subprocess.run([asset_ripper_path, 'raw/', '-o', 'extracted'], check=True)
+	if not os.path.exists('extracted/ExportedProject'):
+		subprocess.run([asset_ripper_path, 'raw/', '-o', 'extracted'], check=True)
 
 	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 		path = 'extracted/ExportedProject/Assets/Resources/local/en_us/%s.txt' % filename
@@ -52,12 +56,20 @@ def main():
 			name = talent_strings[talent['TalentName']]
 		except KeyError:
 			continue
-		try:
-			fixup = talent_fixups[name]
-			icon_path = fixup['iconPath']
-		except KeyError:
-			icon_path = 'Assets/Resources/image/talents/%s.png' % talent['Key']
-		os.link('extracted/ExportedProject/' + icon_path, 'static/talents/%s.png' % talent['Key'])
+		output_path = 'static/talents/%s.png' % talent['Key']
+		fixup = talent_fixups.get(name)
+		if fixup is None or 'iconPath' not in fixup:
+			os.link('extracted/ExportedProject/Assets/Resources/image/talents/%s.png' % talent['Key'], output_path)
+		else:
+			icon_path = 'extracted/ExportedProject/' + fixup['iconPath']
+			crop = fixup.get('iconCrop')
+			if crop is None:
+				os.link(icon_path, output_path)
+			else:
+				left, upper, width, height = crop
+				with PIL.Image.open(icon_path) as image:
+					icon = image.crop((left, upper, left+width, upper+height))
+				icon.save(output_path)
 
 if __name__ == '__main__':
 	main()
