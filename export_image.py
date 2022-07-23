@@ -18,7 +18,6 @@ def export_build(data: game_data.GameData, build: dict) -> io.BytesIO:
 	for url_key_int, count in selected_talents.items():
 		url_key = URLKey()
 		url_key.bytes = url_key_int # pylint: disable=attribute-defined-outside-init
-		print(url_key_int, url_key.bytes, url_key.bits.class_, url_key.bits.tier, url_key.bits.position)
 		classes[url_key.bits.class_] = True
 
 	num_classes = sum(classes.values())
@@ -53,7 +52,14 @@ def _draw_tree(data: game_data.GameData, class_: game_data.TalentClass, selected
 		with PIL.Image.open('static/talents/%s.png' % talent['Key']) as icon:
 			image.paste(icon.resize((32, 32)), pos)
 		draw.rectangle((pos, (pos[0] + 34, pos[1] + 45)), outline=(119, 85, 85))
-		draw.text((pos[0] + 18, pos[1] + 35), str(count), (221, 221, 221), font, 'mt')
+		text_color = (170, 170, 170)
+		if count > 0:
+			fill = (119, 85, 85)
+			if count == talent['maxLevel']:
+				fill = (58, 153, 85)
+			draw.rectangle(((pos[0], pos[1] + 33), (pos[0] + 34, pos[1] + 45)), fill=fill)
+			text_color = (221, 221, 221)
+		draw.text((pos[0] + 18, pos[1] + 35), str(count), text_color, font, 'mt')
 	return image
 
 c_uint16 = ctypes.c_uint16
