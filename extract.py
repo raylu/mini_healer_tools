@@ -9,6 +9,8 @@ import urllib.request
 
 import PIL.Image
 
+import game_data
+
 def main():
 	asset_ripper_path = sys.argv[1]
 
@@ -32,6 +34,9 @@ def main():
 	os.link('extracted/ExportedProject/Assets/Texture2D/Wisdom Tomes.png',
 			'static/favicon.png')
 
+	extract_talents()
+
+def extract_talents():
 	url = 'https://gitlab.com/ezrast/mini-builder/-/raw/main/scripts/talent_fixups.json'
 	with urllib.request.urlopen(url) as r:
 		assert r.status == 200
@@ -41,13 +46,7 @@ def main():
 		talent_fixups = json.load(f)
 
 	with open('extracted/TALENT', 'r', encoding='utf-8') as f:
-		talent_strings: dict[str, str] = {}
-		for line in f:
-			if line in ('\n', 'END'):
-				continue
-			key, value = line.rstrip('\n').split('=', 1)
-			assert key not in talent_strings
-			talent_strings[key] = value
+		talent_strings = game_data.parse_translation(f)
 	with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 		talent_data = json.load(f)['Talents']
 

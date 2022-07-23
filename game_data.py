@@ -2,6 +2,7 @@ import collections
 import enum
 import json
 import re
+import typing
 
 class TalentClass(enum.IntEnum):
 	DRUID = 0
@@ -18,12 +19,7 @@ class GameData:
 
 		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 			with open('extracted/' + filename, 'r', encoding='utf-8') as f:
-				for line in f:
-					if line in ('\n', 'END'):
-						continue
-					key, value = line.rstrip('\n').split('=', 1)
-					assert key not in self.strings
-					self.strings[key] = value
+				self.strings.update(parse_translation(f))
 
 		with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 			artifact_data = json.load(f)['Artifacts']
@@ -66,3 +62,13 @@ class GameData:
 			except KeyError:
 				pass
 		return extra_strings
+
+def parse_translation(f: typing.TextIO) -> dict[str, str]:
+	strings: dict[str, str] = {}
+	for line in f:
+		if line in ('\n', 'END'):
+			continue
+		key, value = line.rstrip('\n').split('=', 1)
+		assert key not in strings
+		strings[key] = value
+	return strings
