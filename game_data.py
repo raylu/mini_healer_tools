@@ -7,7 +7,7 @@ class GameData:
 		self.strings = {}
 		self.artifacts = {}
 		self.artifact_names = collections.defaultdict(list)
-		self.talents = None
+		self.talents: dict = None
 
 		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
 			with open('extracted/' + filename, 'r', encoding='utf-8') as f:

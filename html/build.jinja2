@@ -2,6 +2,7 @@
 
 {% block body %}
 <header class="build"></header>
+
 <main class="build">
 	<div class="tree"></div>
 	<div class="info"></div>
@@ -14,6 +15,10 @@
 		<div id="pending_item"></div>
 	</div>
 </main>
+
+<form id="export" action="/build/export" method="post" enctype="text/plain">
+	<input type="submit" value="export image">
+</form>
 
 <script src="https://cdn.jsdelivr.net/npm/@jsonurl/jsonurl@1.1.6/dist/jsonurl.min.js"
 	integrity="sha256-4+ssSqCkuDc9UPEY8zOLzzBuY8QnbZdhrqbIDfYlsCY=" crossorigin="anonymous"></script>

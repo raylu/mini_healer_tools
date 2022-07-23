@@ -16,17 +16,20 @@ a:hover {
 	color: #5ad;
 }
 
+input {
+	background-color: #111;
+	color: inherit;
+	border: 1px solid #222;
+	font: inherit;
+}
+
 form#search {
 	margin: 25px auto;
 	width: 250px;
 	position: relative; /* for div#results */
 }
 form#search input {
-	background-color: #111;
-	color: inherit;
-	border: 1px solid #222;
 	width: 100%;
-	font: inherit;
 }
 form#search div#results {
 	display: none;
@@ -51,11 +54,12 @@ form#search div#results div.result:hover {
 main, header {
 	width: 90%;
 	max-width: 1200px;
-	margin: 10px auto 100px;
-	padding: 25px 10px;
+	margin: 10px auto;
 	background-color: #111;
 }
-
+main {
+	padding: 25px 10px;
+}
 main section {
 	margin: 15px 10px;
 	padding: 5px;
@@ -69,6 +73,7 @@ main section h2 {
 main.root {
 	display: flex;
 	justify-content: space-evenly;
+	margin-top: 50px;
 }
 
 main.artifacts, div#pending_item, div#selected_items {
@@ -153,6 +158,7 @@ main.build div.items div#pending_item section.artifact:hover {
 }
 
 footer {
+	margin-top: 100px;
 	text-align: center;
 	font-family: monospace;
 	font-size: 14px;

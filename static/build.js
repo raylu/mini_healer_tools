@@ -221,5 +221,9 @@
 		updateURL(build);
 	});
 
+	document.querySelector('form#export').addEventListener('formdata', (event) => {
+		event.formData.set('build', JSON.stringify(build));
+	});
+
 	showTree(0);
 })();

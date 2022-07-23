@@ -8,11 +8,13 @@ if len(sys.argv) == 3:
 
 # pylint: disable=wrong-import-position
 import copy
+import json
 import mimetypes
 
 from pigwig import PigWig, Response
 from pigwig.exceptions import HTTPException
 
+import export_image
 import game_data
 
 def root(request):
@@ -23,6 +25,15 @@ def artifacts_page(request, name=None):
 
 def build_page(request, name=None):
 	return Response.render(request, 'build.jinja2', {})
+
+def export_build(request):
+	body, body_len = request.body
+	expected = b'build='
+	field = body.read(len(expected))
+	assert field == expected, 'expected %r but got %r' % (expected, field)
+	build = json.loads(body.read(body_len - len(expected)))
+	export_image.export_build(data, build)
+	return Response('hi')
 
 def get_artifact_names(request):
 	return Response.json(data.artifact_names)
@@ -56,6 +67,7 @@ routes = [
 	('GET', '/artifacts', artifacts_page),
 	('GET', '/artifacts/<name>', artifacts_page),
 	('GET', '/build', build_page),
+	('POST', '/build/export', export_build),
 	('GET', '/data/artifact_names', get_artifact_names),
 	('GET', '/data/artifact/<key>', get_artifact),
 	('GET', '/data/talents', get_talents),
