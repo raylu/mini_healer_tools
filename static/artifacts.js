@@ -97,6 +97,7 @@ class Artifacts {
 
 		const name = document.createElement('h2');
 		name.innerText = artifact['ArtifactName'];
+		name.classList.add(rarity.toLowerCase());
 		section.appendChild(name);
 
 		const type = document.createElement('div');

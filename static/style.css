@@ -66,9 +66,6 @@ main section {
 	border: 1px solid #222;
 	width: 400px;
 }
-main section h2 {
-	margin: 0 0 1em;
-}
 
 main.root {
 	display: flex;
@@ -82,6 +79,7 @@ main.artifacts, div#pending_item, div#selected_items {
 	justify-content: space-evenly;
 }
 main section.artifact div.icon {
+	margin: 0 auto 0.25em;
 	width: 64px;
 	height: 64px;
 	background-size: 40px;
@@ -89,6 +87,13 @@ main section.artifact div.icon {
 	background-repeat: no-repeat;
 	background-color: #352f2a;
 	border-radius: 16px;
+}
+main section.artifact h2 {
+	margin: 0 0 0.5em;
+	text-align: center;
+}
+main section.artifact h2.unique {
+	color: #9e7c2e;
 }
 main section.artifact div.icon > img {
 	width: 64px;
@@ -98,8 +103,9 @@ main section.artifact div.icon > img.unique {
 	filter: hue-rotate(52deg) saturate(2) brightness(0.8);
 }
 main section.artifact div.type {
-	color: #777;
 	margin-bottom: 1em;
+	text-align: center;
+	color: #777;
 }
 main section.artifact div.desc {
 	margin-bottom: 1em;
@@ -163,6 +169,11 @@ main.build div.items div#selected_items section.artifact div.delete {
 	top: 10px;
 	right: 10px;
 	cursor: pointer;
+}
+
+main.build form#search input {
+	background-color: #070707;
+	border-color: #333;
 }
 
 main.build div.items div#pending_item section.artifact {
