@@ -81,9 +81,21 @@ main.artifacts, div#pending_item, div#selected_items {
 	flex-wrap: wrap;
 	justify-content: space-evenly;
 }
-main section.artifact img.icon {
+main section.artifact div.icon {
 	width: 64px;
 	height: 64px;
+	background-size: 40px;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-color: #352f2a;
+	border-radius: 16px;
+}
+main section.artifact div.icon > img {
+	width: 64px;
+	height: 64px;
+}
+main section.artifact div.icon > img.unique {
+	filter: hue-rotate(52deg) saturate(2) brightness(0.8);
 }
 main section.artifact div.type {
 	color: #777;

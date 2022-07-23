@@ -84,9 +84,15 @@ class Artifacts {
 		const res = await fetch('/data/artifact/' + key);
 		const artifact = await res.json();
 
-		const icon = document.createElement('img');
-		icon.src = `/static/artifacts/${artifact['Key']}.png`;
+		const rarity = this.rarities[artifact['Rarity']];
+
+		const icon = document.createElement('div');
 		icon.classList.add('icon');
+		icon.style.backgroundImage = `url(/static/artifacts/${artifact['Key']}.png)`;
+		const img = document.createElement('img');
+		img.src = '/static/artifact_frame.png';
+		img.classList.add(rarity.toLowerCase());
+		icon.appendChild(img);
 		section.appendChild(icon);
 
 		const name = document.createElement('h2');
@@ -97,7 +103,7 @@ class Artifacts {
 		const types = [
 			this.types[artifact['Type']],
 		];
-		if (artifact['Rarity']) types.push(this.rarities[artifact['Rarity']]);
+		if (artifact['Rarity']) types.push(rarity);
 		if (artifact['isUltraRare']) types.push('Ultra Rare');
 		if (artifact['isChaotic']) types.push('Chaotic');
 		type.innerHTML = types.join(', ');

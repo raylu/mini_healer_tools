@@ -37,6 +37,8 @@ def main():
 			'extracted/indienovaBC-Regular-12px.ttf')
 	os.link(ASSETS_DIR + 'Texture2D/Wisdom Tomes.png',
 			'static/favicon.png')
+	os.link(ASSETS_DIR + 'Texture2D/Frame.png',
+			'static/artifact_frame.png')
 
 	extract_artifacts()
 	extract_talents()
@@ -60,7 +62,7 @@ def extract_artifacts():
 			else:
 				m = re.search(r'artifact.Icon = (\w+);', line)
 				if m:
-					for key in active_keys:
+					for key in active_keys: # pylint: disable=not-an-iterable
 						icon_names[key] = m.group(1)
 
 	image_guids: dict[str, str] = {} # "d599cf88e82d8c84ba650b2d80ab45d2": "Resources/image/artifacts/SIMPLESHIELD.png"
@@ -127,9 +129,7 @@ def extract_artifacts():
 				if key.endswith(anom_suffix):
 					key = key[:-len(anom_suffix)]
 					break
-			found = link_artifact_icon(key, output_path)
-		if not found:
-			print(key)
+			link_artifact_icon(key, output_path)
 
 INPUT_DIRS = [
 	ASSETS_DIR + 'Resources/image/artifacts/',
