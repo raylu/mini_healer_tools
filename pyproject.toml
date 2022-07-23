@@ -535,3 +535,11 @@ ignored-argument-names = "_.*|^ignored_|^unused_"
 # List of qualified module names which can have objects that can redefine
 # builtins.
 redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", "builtins", "io"]
+
+[tool.yapf]
+blank_lines_around_top_level_definition = 1
+blank_lines_between_top_level_imports_and_variables = 1
+column_limit = 120
+continuation_align_style = "FIXED"
+spaces_before_comment = 1
+use_tabs = true
