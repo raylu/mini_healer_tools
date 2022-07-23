@@ -30,13 +30,13 @@ class Artifacts {
 			// special
 			16: 'Belt',
 			20: 'Map',
-		}
+		};
 		this.rarities = {
 			0: 'Uncommon',
 			1: 'Rare',
 			2: 'Epic',
 			3: 'Unique',
-		}
+		};
 	}
 
 	async fetchArtifactNames() {
@@ -96,7 +96,7 @@ class Artifacts {
 		if (artifact['isUltraRare']) types.push('Ultra Rare');
 		if (artifact['isChaotic']) types.push('Chaotic');
 		type.innerHTML = types.join(', ');
-		type.classList.add('type')
+		type.classList.add('type');
 		section.appendChild(type);
 
 		if (artifact['specialDesc']) {
@@ -107,7 +107,7 @@ class Artifacts {
 				return replacement ? replacement : needle;
 			};
 			desc.innerHTML = artifact['specialDesc'].replaceAll(/\[\S+\]/g, replace);
-			desc.classList.add('desc')
+			desc.classList.add('desc');
 			section.appendChild(desc);
 		}
 
@@ -116,7 +116,7 @@ class Artifacts {
 			props.innerHTML += 'item level: ' + artifact['HiddenItemLevel'];
 		if (artifact['DropRate'])
 			props.innerHTML += '<br>drop rate: ' + artifact['DropRate'] * 100 + '%';
-		props.classList.add('props')
+		props.classList.add('props');
 		section.appendChild(props);
 	}
 }

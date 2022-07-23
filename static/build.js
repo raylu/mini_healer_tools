@@ -1,4 +1,5 @@
 'use strict';
+/* global Artifacts, JsonURL */
 (async () => {
 	async function fetchTalents() {
 		const res = await fetch('/data/talents');
@@ -60,7 +61,7 @@
 			talentDiv.style.gridColumn = talent['Position'] + 1;
 
 			const img = document.createElement('img');
-			img.src = `/static/talents/${talent['Key']}.png`
+			img.src = `/static/talents/${talent['Key']}.png`;
 			talentDiv.appendChild(img);
 
 			const points = build['talents'][talentUrlKey(talent)] || 0;
