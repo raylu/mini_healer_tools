@@ -35,12 +35,12 @@
 			'items': [],
 		};
 		if (location.search.substr(0, 3) === '?s=') {
-			parsedBuild = JsonURL.parse(location.search.substr(3), {AQF: true});
+			parsedBuild = JsonURL.parse(location.search.substr(3), {AQF: true, noEmptyComposite: true});
 		}
 		return parsedBuild;
 	}
 	function updateURL(buildData) {
-		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify(buildData, {AQF: true}));
+		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify(buildData, {AQF: true, noEmptyComposite: true}));
 	}
 
 	const main = document.querySelector('main');
