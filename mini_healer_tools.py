@@ -64,7 +64,7 @@ def _fetch_strings(s: str) -> dict[str, str]:
 
 def _resolve_string(s: str) -> str:
 	name = strings[s]
-	if name[0] == '[' and name[-1] == ']':
+	if re.match(r'\[[A-Z_]+\]', name):
 		name = strings[name[1:-1]]
 	return name
 
