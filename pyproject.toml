@@ -347,6 +347,7 @@ confidence = ["HIGH", "CONTROL_FLOW", "INFERENCE", "INFERENCE_FAILURE", "UNDEFIN
 # --disable=W".
 disable = [
 	"bad-inline-option",
+	"consider-iterating-dictionary",
 	"consider-using-f-string",
 	"deprecated-pragma",
 	"file-ignored",
