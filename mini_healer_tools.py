@@ -47,7 +47,7 @@ def get_artifact(request, key):
 	if 'ArtifactName' in artifact:
 		artifact['ArtifactName'] = data.resolve_string(artifact['ArtifactName'])
 	if 'specialDesc' in artifact:
-		artifact['specialDesc'] = data.resolve_string(artifact['specialDesc'])
+		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])
 		artifact['strings'] = data.fetch_strings(artifact['specialDesc'])
 	return Response.json(artifact)
 

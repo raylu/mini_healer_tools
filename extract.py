@@ -45,7 +45,7 @@ def main():
 	artifact_data = extract_artifacts()
 	extract_talents()
 
-	data = game_data.GameData()
+	data = game_data.GameData(artifact_descriptions=False)
 	for artifact in artifact_data:
 		try:
 			artifact['specialDesc'] = data.resolve_string(artifact['specialDesc'])

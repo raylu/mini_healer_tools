@@ -25,9 +25,13 @@ def extract_descriptions(dotnet_script_path:str, artifacts: typing.Sequence[dict
 				f.write('a[%d].%s = %s;\n' % (i, k, v))
 		f.write('''
 Dictionary<string, List<string>> descriptions = new Dictionary<string, List<string>>(a.Length);
-foreach (Artifact artifact in a)
-	descriptions[artifact.Key] = getDescriptionByArtifact(artifact, 10, false);
-File.WriteAllText("static/artifact_descriptions.json", System.Text.Json.JsonSerializer.Serialize(descriptions));
+static bool EmptyDesc(string s) { return s == "" || s == " "; }
+foreach (Artifact artifact in a) {
+	List<string> desc = getDescriptionByArtifact(artifact, 15, false);
+	desc.RemoveAll(EmptyDesc);
+	descriptions[artifact.Key] = desc;
+}
+File.WriteAllText("extracted/artifact_descriptions.json", System.Text.Json.JsonSerializer.Serialize(descriptions));
 ''')
 
 	subprocess.run([dotnet_script_path, '--verbosity=e', csx_path], check=True)

@@ -11,10 +11,11 @@ class TalentClass(enum.IntEnum):
 	PALADIN = 5
 
 class GameData:
-	def __init__(self):
+	def __init__(self, artifact_descriptions=True):
 		self.strings: dict[str, str] = {}
 		self.artifacts: dict[str, dict] = {}
 		self.artifact_names: dict[str, dict] = {}
+		self.artifact_descriptions: dict[str, list[str]] = None
 		self.talents: dict = None
 
 		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
@@ -35,6 +36,9 @@ class GameData:
 			rarities = {self.artifacts[key].get('Rarity') for key in keys}
 			(rarity,) = rarities
 			self.artifact_names[name] = {'keys': keys, 'rarity': rarity}
+		if artifact_descriptions:
+			with open('extracted/artifact_descriptions.json', 'r', encoding='utf-8') as f:
+				self.artifact_descriptions = json.load(f)
 
 		with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 			talent_data = json.load(f)['Talents']
