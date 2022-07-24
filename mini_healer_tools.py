@@ -46,9 +46,14 @@ def get_artifact(request, key):
 
 	if 'ArtifactName' in artifact:
 		artifact['ArtifactName'] = data.resolve_string(artifact['ArtifactName'])
+	artifact['attributes'] = copy.deepcopy(data.artifact_attributes[artifact['Key']])
+	artifact['strings'] = {}
+	for attr in artifact['attributes']:
+		attr['attribute'] = data.resolve_string('ATTRIBUTE_%s_TEXT' % attr['attribute'])
+		artifact['strings'].update(data.fetch_strings(attr['attribute']))
 	if 'specialDesc' in artifact:
 		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])
-		artifact['strings'] = data.fetch_strings(artifact['specialDesc'])
+		artifact['strings'].update(data.fetch_strings(artifact['specialDesc']))
 	return Response.json(artifact)
 
 def get_talents(request):

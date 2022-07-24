@@ -120,17 +120,28 @@ class Artifacts {
 		type.classList.add('type');
 		section.appendChild(type);
 
-		if (artifact['specialDesc']) {
-			const desc = document.createElement('div');
-			const replace = (needle) => {
-				const textVar = needle.substr(1, needle.length - 2);
-				const replacement = artifact['strings'][textVar];
-				return replacement ? replacement : needle;
-			};
-			desc.innerHTML = artifact['specialDesc'].replaceAll(/\[\S+\]/g, replace);
-			desc.classList.add('desc');
-			section.appendChild(desc);
+		const desc = document.createElement('div');
+		desc.classList.add('desc');
+		const replace = (needle) => {
+			const textVar = needle.substr(1, needle.length - 2);
+			const replacement = artifact['strings'][textVar];
+			return replacement ? replacement : needle;
+		};
+		for (const attr of artifact['attributes']) {
+			const sign = attr['is_negative'] ? '' : '+';
+			let number = attr['t1_min'].toString();
+			if (attr['t1_min'] !== attr['t1_max'])
+				number = `${attr['t1_min']} to ${attr['t1_max']}`;
+			const attribute = attr['attribute'].replaceAll(/\[\S+\]/g, replace);
+			let line = `${sign}${number}`;
+			if (attribute[0] !== '%')
+				line += ' ';
+			line += attribute;
+			desc.innerHTML += line + '<br>';
 		}
+		if (artifact['specialDesc'])
+			desc.innerHTML += '<br>' + artifact['specialDesc'].replaceAll(/\[\S+\]/g, replace);
+		section.appendChild(desc);
 
 		const props = document.createElement('div');
 		if (artifact['HiddenItemLevel'])
