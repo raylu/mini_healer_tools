@@ -10,6 +10,14 @@ class TalentClass(enum.IntEnum):
 	OCCULTIST = 2
 	PALADIN = 5
 
+class DamageElement(enum.IntEnum):
+	# see DamageData.cs
+	PHYSICAL = 0
+	FIRE = 1
+	ICE = 2
+	LIGHTNING = 3
+	NEMESIS = 4
+
 class GameData:
 	def __init__(self, artifact_descriptions=True):
 		self.strings: dict[str, str] = {}
@@ -40,8 +48,24 @@ class GameData:
 		if artifact_descriptions:
 			with open('extracted/artifact_descriptions.json', 'r', encoding='utf-8') as f:
 				self.artifact_descriptions = json.load(f)
+
+		with open('extracted/AttributesData', 'r', encoding='utf-8') as f:
+			attr_elements: dict[int, DamageElement] = {}
+			for attr in json.load(f)['ArtifactAttributes']:
+				element = attr.get('associatedElement')
+				if element is None:
+					attr_elements[attr['attributeType']] = None
+				else:
+					attr_elements[attr['attributeType']] = DamageElement(element)
 		with open('extracted/artifact_attributes.json', 'r', encoding='utf-8') as f:
 			self.artifact_attributes = json.load(f)
+			for attr_list in self.artifact_attributes.values():
+				for attr in attr_list:
+					element = attr_elements[attr['type']]
+					if element is None:
+						attr['element'] = None
+					else:
+						attr['element'] = element.name.lower()
 
 		with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 			talent_data = json.load(f)['Talents']

@@ -137,6 +137,8 @@ class Artifacts {
 			if (attribute[0] !== '%')
 				line += ' ';
 			line += attribute;
+			if (attr['element'] !== null)
+				line = `<span class="${attr['element']}">${line}</span>`;
 			desc.innerHTML += line + '<br>';
 		}
 		if (artifact['specialDesc'])

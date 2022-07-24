@@ -22,6 +22,7 @@ foreach (Artifact artifact in a) {
 public class AttributeJsonConverter : System.Text.Json.Serialization.JsonConverter<ArtifactAttribute> {
 	public override void Write(System.Text.Json.Utf8JsonWriter writer, ArtifactAttribute attr, System.Text.Json.JsonSerializerOptions options) {
 		writer.WriteStartObject();
+		writer.WriteNumber("type", (int)attr.attributeType);
 		writer.WriteString("attribute", attr.attributeType.ToString());
 		writer.WriteNumber("t1_min", attr.T1_MIN);
 		writer.WriteNumber("t1_max", attr.T1_MAX);

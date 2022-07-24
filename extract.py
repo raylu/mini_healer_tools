@@ -34,6 +34,8 @@ def main():
 		os.link(path, 'extracted/' + filename)
 	os.link(ASSETS_DIR + 'Resources/gamedata/artifact/ArtifactData.json',
 			'extracted/ArtifactData')
+	os.link(ASSETS_DIR + 'Resources/gamedata/attribute/AttributesData.json',
+			'extracted/AttributesData')
 	os.link(ASSETS_DIR + 'Resources/gamedata/talent/TalentData.json',
 			'extracted/TalentData')
 	os.link(ASSETS_DIR + 'Resources/fonts/raw/indienovaBC-Regular-12px.ttf',

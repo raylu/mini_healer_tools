@@ -141,6 +141,24 @@ main section.artifact div.type {
 main section.artifact div.desc {
 	margin-bottom: 1em;
 }
+main section.artifact div.desc span.healpower {
+	color: #d660af; /* HealpowerAttributeColor */
+}
+main section.artifact div.desc span.physical {
+	color: #bcbcbc; /* PhysicalElementColorHex */
+}
+main section.artifact div.desc span.fire {
+	color: #d55; /* FireElementColorHex is ff3333 */
+}
+main section.artifact div.desc span.ice {
+	color: #6983ff; /* IceElementColorHex */
+}
+main section.artifact div.desc span.lightning {
+	color: #efd73c; /* LightningElementColorHex */
+}
+main section.artifact div.desc span.nemesis {
+	color: #c5c; /* NemesisElementColorHex is ce31c3 */
+}
 main section.artifact div.props {
 	color: #777;
 }

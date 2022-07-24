@@ -48,9 +48,15 @@ def get_artifact(request, key):
 		artifact['ArtifactName'] = data.resolve_string(artifact['ArtifactName'])
 	artifact['attributes'] = copy.deepcopy(data.artifact_attributes[artifact['Key']])
 	artifact['strings'] = {}
+
 	for attr in artifact['attributes']:
+		if attr['attribute'] in ('INCREASE_HEALPOWER_FLAT', 'INCREASE_HEALPOWER_PERCENT'):
+			# special case in AttributesManager.getTextByAttribute
+			attr['element'] = 'healpower'
+
 		attr['attribute'] = data.resolve_string('ATTRIBUTE_%s_TEXT' % attr['attribute'])
 		artifact['strings'].update(data.fetch_strings(attr['attribute']))
+
 	if 'specialDesc' in artifact:
 		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])
 		artifact['strings'].update(data.fetch_strings(artifact['specialDesc']))
