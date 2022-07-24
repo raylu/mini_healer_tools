@@ -4,7 +4,7 @@ import typing
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
 
-def extract_descriptions(dotnet_script_path:str, artifacts: typing.Sequence[dict]):
+def extract_descriptions(dotnet_script_path: str, artifacts: typing.Sequence[dict]):
 	csx_path = 'extracted/ArtifactDescriptions.csx'
 	with open(csx_path, 'w', encoding='ascii') as f:
 		write_csx(f)
