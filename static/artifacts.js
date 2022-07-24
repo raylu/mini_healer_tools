@@ -132,7 +132,7 @@ class Artifacts {
 			let number = attr['t1_min'].toString();
 			if (attr['t1_min'] !== attr['t1_max'])
 				number = `${attr['t1_min']} to ${attr['t1_max']}`;
-			const attribute = attr['attribute'].replaceAll(/\[\S+\]/g, replace);
+			const attribute = attr['text'].replaceAll(/\[\S+\]/g, replace);
 			let line = `${sign}${number}`;
 			if (attribute[0] !== '%')
 				line += ' ';

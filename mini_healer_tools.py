@@ -38,7 +38,7 @@ def export_build(request):
 def get_artifact_names(request):
 	return Response.json(data.artifact_names)
 
-def get_artifact(request, key):
+def get_artifact(request, key: str):
 	try:
 		artifact = copy.copy(data.artifacts[key])
 	except KeyError:
@@ -54,8 +54,8 @@ def get_artifact(request, key):
 			# special case in AttributesManager.getTextByAttribute
 			attr['element'] = 'healpower'
 
-		attr['attribute'] = data.resolve_string('ATTRIBUTE_%s_TEXT' % attr['attribute'])
-		artifact['strings'].update(data.fetch_strings(attr['attribute']))
+		attr['text'] = data.resolve_string(attr['text'])
+		artifact['strings'].update(data.fetch_strings(attr['text']))
 
 	if 'specialDesc' in artifact:
 		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])

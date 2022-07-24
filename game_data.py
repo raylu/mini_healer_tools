@@ -49,23 +49,21 @@ class GameData:
 			with open('extracted/artifact_descriptions.json', 'r', encoding='utf-8') as f:
 				self.artifact_descriptions = json.load(f)
 
+		attr_data: dict[int, dict] = {}
 		with open('extracted/AttributesData', 'r', encoding='utf-8') as f:
-			attr_elements: dict[int, DamageElement] = {}
 			for attr in json.load(f)['ArtifactAttributes']:
 				element = attr.get('associatedElement')
-				if element is None:
-					attr_elements[attr['attributeType']] = None
-				else:
-					attr_elements[attr['attributeType']] = DamageElement(element)
+				if element is not None:
+					element = DamageElement(element).name.lower()
+				attr_data[attr['attributeType']] = {
+					'element': element,
+					'text': attr['text'],
+				}
 		with open('extracted/artifact_attributes.json', 'r', encoding='utf-8') as f:
 			self.artifact_attributes = json.load(f)
 			for attr_list in self.artifact_attributes.values():
 				for attr in attr_list:
-					element = attr_elements[attr['type']]
-					if element is None:
-						attr['element'] = None
-					else:
-						attr['element'] = element.name.lower()
+					attr.update(attr_data[attr['type']])
 
 		with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 			talent_data = json.load(f)['Talents']
