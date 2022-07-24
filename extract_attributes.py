@@ -8,6 +8,37 @@ def extract_attributes(dotnet_script_path: str, artifacts: typing.Sequence[dict]
 	with open(csx_path, 'w', encoding='ascii') as f:
 		write_csx(f)
 
+		f.write('Artifact[] a = new Artifact[%d];\n' % len(artifacts))
+		for i, artifact in enumerate(artifacts):
+			f.write('a[%d].Key = "%s";\n' % (i, artifact['Key']))
+			if artifact.get('isDivine'):
+				f.write('a[%d].isDivine = true;\n' % i)
+		f.write('''
+Dictionary<string, List<ArtifactAttribute>> attributes = new Dictionary<string, List<ArtifactAttribute>>(a.Length);
+foreach (Artifact artifact in a) {
+	List<ArtifactAttribute> aa = getArtifactBaseAttributes(artifact, null);
+	attributes[artifact.Key] = aa;
+}
+public class AttributeJsonConverter : System.Text.Json.Serialization.JsonConverter<ArtifactAttribute> {
+	public override void Write(System.Text.Json.Utf8JsonWriter writer, ArtifactAttribute attr, System.Text.Json.JsonSerializerOptions options) {
+		writer.WriteStartObject();
+		writer.WriteString("attribute", attr.attributeType.ToString());
+		writer.WriteNumber("t1_min", attr.T1_MIN);
+		writer.WriteNumber("t1_max", attr.T1_MAX);
+		writer.WriteBoolean("is_negative", attr.isNegative);
+		writer.WriteString("ref_id", attr.refId);
+		writer.WriteEndObject();
+	}
+	public override ArtifactAttribute Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options) =>
+			null;
+}
+var serializeOptions = new System.Text.Json.JsonSerializerOptions {
+    WriteIndented = true,
+    Converters = { new AttributeJsonConverter() }
+};
+File.WriteAllText("extracted/artifact_attributes.json", System.Text.Json.JsonSerializer.Serialize(attributes, serializeOptions));
+''')
+
 	subprocess.run([dotnet_script_path, '--verbosity=e', csx_path], check=True)
 
 def write_csx(f: typing.TextIO) -> None:

@@ -11,6 +11,7 @@ import urllib.request
 import PIL.Image
 import yaml
 
+import extract_attributes
 import extract_descriptions
 import game_data
 
@@ -45,6 +46,7 @@ def main():
 	artifact_data = extract_artifacts()
 	extract_talents()
 
+	extract_attributes.extract_attributes(dotnet_script_path, artifact_data)
 	data = game_data.GameData(artifact_descriptions=False)
 	for artifact in artifact_data:
 		try:
