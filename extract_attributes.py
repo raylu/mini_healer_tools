@@ -64,7 +64,8 @@ def aa_lines() -> list[str]:
 	with open(ASSETS_DIR + '/MonoScript/Assembly-CSharp/ArtifactAttribute.cs', 'r', encoding='ascii') as f:
 		start = False
 		for line in f:
-			if line == '\n': continue
+			if line == '\n':
+				continue
 			if not start and line == 'public class ArtifactAttribute\n':
 				start = True
 			if start:
