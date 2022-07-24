@@ -54,8 +54,13 @@ def get_artifact(request, key: str):
 			# special case in AttributesManager.getTextByAttribute
 			attr['element'] = 'healpower'
 
-		attr['text'] = data.resolve_string(attr['text'])
-		artifact['strings'].update(data.fetch_strings(attr['text']))
+		if attr['text'] == 'ATTRIBUTE_TALENT_LEVEL_TEXT':
+			attr['text'] = data.resolve_string('TALENT_%s_NAME' % attr['ref_id'])
+		else:
+			attr['text'] = data.resolve_string(attr['text'])
+			artifact['strings'].update(data.fetch_strings(attr['text']))
+		if attr['postText'] is not None:
+			attr['text'] += ' ' + data.resolve_string(attr['postText'])
 
 	if 'specialDesc' in artifact:
 		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])

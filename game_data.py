@@ -58,6 +58,7 @@ class GameData:
 				attr_data[attr['attributeType']] = {
 					'element': element,
 					'text': attr['text'],
+					'postText': attr.get('postText'),
 				}
 		with open('extracted/artifact_attributes.json', 'r', encoding='utf-8') as f:
 			self.artifact_attributes = json.load(f)
