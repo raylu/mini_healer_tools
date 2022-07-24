@@ -11,12 +11,14 @@ import urllib.request
 import PIL.Image
 import yaml
 
+import extract_descriptions
 import game_data
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
 
 def main():
 	asset_ripper_path = sys.argv[1]
+	dotnet_script_path = sys.argv[2]
 
 	try:
 		os.mkdir('extracted')
@@ -40,10 +42,18 @@ def main():
 	os.link(ASSETS_DIR + 'Texture2D/Frame.png',
 			'static/artifact_frame.png')
 
-	extract_artifacts()
+	artifact_data = extract_artifacts()
 	extract_talents()
 
-def extract_artifacts():
+	data = game_data.GameData()
+	for artifact in artifact_data:
+		try:
+			artifact['specialDesc'] = data.resolve_string(artifact['specialDesc'])
+		except KeyError:
+			artifact['specialDesc'] = ''
+	extract_descriptions.extract_descriptions(dotnet_script_path, artifact_data)
+
+def extract_artifacts() -> dict:
 	try:
 		os.mkdir('static/artifacts')
 	except FileExistsError:
@@ -130,6 +140,8 @@ def extract_artifacts():
 					key = key[:-len(anom_suffix)]
 					break
 			link_artifact_icon(key, output_path)
+
+	return artifact_data
 
 INPUT_DIRS = [
 	ASSETS_DIR + 'Resources/image/artifacts/',

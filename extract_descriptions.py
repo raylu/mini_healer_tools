@@ -4,10 +4,31 @@ import typing
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
 
-def extract_descriptions(dotnet_script_path:str, artifact_keys: list[str]):
-	csx_path = 'extracted/ArtifactDescription.csx'
+def extract_descriptions(dotnet_script_path:str, artifacts: typing.Sequence[dict]):
+	csx_path = 'extracted/ArtifactDescriptions.csx'
 	with open(csx_path, 'w', encoding='ascii') as f:
 		write_csx(f)
+
+		f.write('Artifact[] a = new Artifact[%d];\n' % len(artifacts))
+		for i, artifact in enumerate(artifacts):
+			for k, v in artifact.items():
+				if isinstance(v, list):
+					continue
+				elif isinstance(v, float):
+					v = str(v) + 'f'
+				elif isinstance(v, str):
+					v = '"%s"' % v
+				elif isinstance(v, bool):
+					v = str(v).lower()
+				elif not isinstance(v, int):
+					raise AssertionError('unexpected type %s for %r %r' % (type(v), artifact['Key'], k))
+				f.write('a[%d].%s = %s;\n' % (i, k, v))
+		f.write('''
+Dictionary<string, List<string>> descriptions = new Dictionary<string, List<string>>(a.Length);
+foreach (Artifact artifact in a)
+	descriptions[artifact.Key] = getDescriptionByArtifact(artifact, 10, false);
+File.WriteAllText("static/artifact_descriptions.json", System.Text.Json.JsonSerializer.Serialize(descriptions));
+''')
 
 	subprocess.run([dotnet_script_path, '--verbosity=e', csx_path], check=True)
 
@@ -173,4 +194,4 @@ def extract_static_consts(f: typing.TextIO) -> typing.Generator[str, None, None]
 
 if __name__ == '__main__':
 	import sys
-	extract_descriptions(sys.argv[1], sys.argv[2:])
+	extract_descriptions(sys.argv[1], [])
