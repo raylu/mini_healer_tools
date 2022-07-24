@@ -27,7 +27,7 @@ class GameData:
 		self.artifact_attributes: dict[str, list[dict]] = None
 		self.talents: dict = None
 
-		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
+		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'SKILL', 'TALENT']:
 			with open('extracted/' + filename, 'r', encoding='utf-8') as f:
 				self.strings.update(parse_translation(f))
 
@@ -95,7 +95,8 @@ class GameData:
 			try:
 				extra_strings[var] = self.strings[var]
 			except KeyError:
-				pass
+				if var.startswith('LINK_'):
+					extra_strings[var] = self.strings[var[len('LINK_'):] + '_NAME']
 		return extra_strings
 
 def parse_translation(f: typing.TextIO) -> dict[str, str]:
@@ -104,6 +105,8 @@ def parse_translation(f: typing.TextIO) -> dict[str, str]:
 		if line in ('\n', 'END'):
 			continue
 		key, value = line.rstrip('\n').split('=', 1)
-		assert key not in strings
+		if key.startswith('SKILL_') and key in strings:
+			continue
+		assert key not in strings, '%r seen twice' % key
 		strings[key] = value
 	return strings

@@ -29,7 +29,7 @@ def main():
 	if not os.path.exists('extracted/ExportedProject'):
 		subprocess.run([asset_ripper_path, 'raw/', '-o', 'extracted'], check=True)
 
-	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'TALENT']:
+	for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'SKILL', 'TALENT']:
 		path = 'extracted/ExportedProject/Assets/Resources/local/en_us/%s.txt' % filename
 		os.link(path, 'extracted/' + filename)
 	os.link(ASSETS_DIR + 'Resources/gamedata/artifact/ArtifactData.json',

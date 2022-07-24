@@ -125,7 +125,12 @@ class Artifacts {
 		const replace = (needle) => {
 			const textVar = needle.substr(1, needle.length - 2);
 			const replacement = artifact['strings'][textVar];
-			return replacement ? replacement : needle;
+			if (!replacement)
+				return needle;
+			else if (textVar.substr(0, 5) === 'LINK_')
+				return `<span class="link">${replacement}</span>`;
+			else
+				return replacement;
 		};
 		for (const attr of artifact['attributes']) {
 			const sign = attr['is_negative'] ? '' : '+';
@@ -136,7 +141,12 @@ class Artifacts {
 			let line = `${sign}${number}`;
 			if (attribute[0] !== '%')
 				line += ' ';
-			line += attribute;
+			if (attr['ref_id'])
+				line += `<span class="link">${attribute}</span>`;
+			else
+				line += attribute;
+			if (attr['postText'])
+				line += ' ' + attr['postText'];
 			if (attr['element'] !== null)
 				line = `<span class="${attr['element']}">${line}</span>`;
 			desc.innerHTML += line + '<br>';

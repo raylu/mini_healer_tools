@@ -159,6 +159,9 @@ main section.artifact div.desc span.lightning {
 main section.artifact div.desc span.nemesis {
 	color: #c5c; /* NemesisElementColorHex is ce31c3 */
 }
+main section.artifact div.desc span.link {
+	color: #0aa;
+}
 main section.artifact div.props {
 	color: #777;
 }

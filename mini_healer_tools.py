@@ -60,7 +60,7 @@ def get_artifact(request, key: str):
 			attr['text'] = data.resolve_string(attr['text'])
 			artifact['strings'].update(data.fetch_strings(attr['text']))
 		if attr['postText'] is not None:
-			attr['text'] += ' ' + data.resolve_string(attr['postText'])
+			attr['postText'] = data.resolve_string(attr['postText'])
 
 	if 'specialDesc' in artifact:
 		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])
