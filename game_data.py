@@ -18,7 +18,13 @@ class DamageElement(enum.IntEnum):
 	LIGHTNING = 3
 	NEMESIS = 4
 
-TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'EFFECT', 'SKILL', 'TALENT', 'UI']
+class Difficulty(enum.IntEnum):
+	# see Level.cs
+	NORMAL = 0
+	BRUTAL = 1
+	INSANE = 2
+
+TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'BOSS', 'CONTEXT', 'EFFECT', 'SKILL', 'TALENT', 'UI']
 
 class GameData:
 	def __init__(self, artifact_descriptions=True):
@@ -67,6 +73,14 @@ class GameData:
 			for attr_list in self.artifact_attributes.values():
 				for attr in attr_list:
 					attr.update(attr_data[attr['type']])
+
+		with open('extracted/LevelData', 'r', encoding='utf-8') as f:
+			for level in json.load(f)['Levels']:
+				for difficulty in level['Difficulties']:
+					for key in difficulty['Loot']:
+						self.artifacts[key]['droppedBossName'] = self.strings[level['Title']]
+						difficulty_name = Difficulty(difficulty['Difficulty']).name.capitalize()
+						self.artifacts[key]['droppedBossDifficulty'] = difficulty_name
 
 		with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 			talent_data = json.load(f)['Talents']

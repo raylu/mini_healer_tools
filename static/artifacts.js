@@ -158,6 +158,10 @@ class Artifacts {
 		const props = document.createElement('div');
 		if (artifact['HiddenItemLevel'])
 			props.innerHTML += 'item level: ' + artifact['HiddenItemLevel'];
+		if (artifact['droppedBossName']) {
+			props.innerHTML += '<br>dropped by: ' + artifact['droppedBossName'];
+			props.innerHTML += '<br>difficulty: ' + artifact['droppedBossDifficulty'];
+		}
 		if (artifact['DropRate'])
 			props.innerHTML += '<br>drop rate: ' + artifact['DropRate'] * 100 + '%';
 		props.classList.add('props');
