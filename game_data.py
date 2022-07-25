@@ -65,7 +65,7 @@ class GameData:
 					bases.append(artifact)
 				key_list.append({'key': key, 'maxAnomaly': artifact.get('maxAnomaly')})
 			if divinable:
-				(base,) = bases
+				(base,) = bases # pylint: disable=unbalanced-tuple-unpacking
 				base['isDivinable'] = True
 			self.artifact_names[name] = {'keys': key_list, 'rarity': rarity}
 		if artifact_descriptions:
