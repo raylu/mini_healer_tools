@@ -5,6 +5,7 @@ import os
 import os.path
 import re
 import subprocess
+import shutil
 import sys
 import urllib.request
 
@@ -24,7 +25,10 @@ def main():
 	try:
 		os.mkdir('extracted')
 	except FileExistsError:
-		pass
+		for filename in os.listdir('extracted'):
+			path = 'extracted/' + filename
+			if not os.path.isdir(path):
+				os.unlink(path)
 
 	if not os.path.exists('extracted/ExportedProject'):
 		subprocess.run([asset_ripper_path, 'raw/', '-o', 'extracted'], check=True)
@@ -42,10 +46,16 @@ def main():
 			'extracted/TalentData')
 	os.link(ASSETS_DIR + 'Resources/fonts/raw/indienovaBC-Regular-12px.ttf',
 			'extracted/indienovaBC-Regular-12px.ttf')
-	os.link(ASSETS_DIR + 'Texture2D/Wisdom Tomes.png',
-			'static/favicon.png')
-	os.link(ASSETS_DIR + 'Texture2D/Frame.png',
-			'static/artifact_frame.png')
+	static_assets = [
+		('Texture2D/Wisdom Tomes.png', 'static/favicon.png'),
+		('Texture2D/Frame.png', 'static/artifact_frame.png'),
+	]
+	for src, dest in static_assets:
+		try:
+			os.link(ASSETS_DIR + src, dest)
+		except FileExistsError:
+			os.unlink(dest)
+			os.link(ASSETS_DIR + src, dest)
 
 	artifact_data = extract_artifacts()
 	extract_talents()
@@ -63,7 +73,8 @@ def extract_artifacts() -> dict:
 	try:
 		os.mkdir('static/artifacts')
 	except FileExistsError:
-		pass
+		shutil.rmtree('static/artifacts')
+		os.mkdir('static/artifacts')
 
 	with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 		artifact_data = json.load(f)['Artifacts']
@@ -189,7 +200,8 @@ def extract_talents():
 	try:
 		os.mkdir('static/talents')
 	except FileExistsError:
-		pass
+		shutil.rmtree('static/talents')
+		os.mkdir('static/talents')
 	for talent in talent_data:
 		try:
 			name = talent_strings[talent['TalentName']]
