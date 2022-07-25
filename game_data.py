@@ -18,6 +18,8 @@ class DamageElement(enum.IntEnum):
 	LIGHTNING = 3
 	NEMESIS = 4
 
+TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'EFFECT', 'SKILL', 'TALENT', 'UI']
+
 class GameData:
 	def __init__(self, artifact_descriptions=True):
 		self.strings: dict[str, str] = {}
@@ -27,7 +29,7 @@ class GameData:
 		self.artifact_attributes: dict[str, list[dict]] = None
 		self.talents: dict = None
 
-		for filename in ['ARTIFACT', 'ATTRIBUTE', 'CONTEXT', 'SKILL', 'TALENT']:
+		for filename in TRANSLATION_FILES:
 			with open('extracted/' + filename, 'r', encoding='utf-8') as f:
 				self.strings.update(parse_translation(f))
 
@@ -88,6 +90,17 @@ class GameData:
 			value = self.strings[value[1:-1]]
 		return value
 
+	TOOLTIP_NAME_MAP = { # see UtilsManager.getTooltipByKey
+		'ASCEND':              'UI_TOOLTIP_ACSEND_NAME',
+		'BLOOD_LUST':          'UI_TOOLTIP_BLOODLUST_NAME',
+		'ENERGY_DEPOT_CHARGE': 'UI_TOOLTIP_ENERGY_CHARGE_NAME',
+		'FROST_METEOR':        'SKILL_FROST_METEOR_NAME',
+		'WALL_OF_PAIN':        'ARTIFACT_WALL_OF_PAIN_NAME',
+		'DAZE':                'RUNE_DAZE_NAME',
+		'BULWARK':             'RUNE_BULWARK_NAME',
+		'DECAYING_CORPSE':     'EFFECT_DECAYING_CORPSE_NAME',
+	}
+
 	def fetch_strings(self, s: str) -> dict[str, str]:
 		extra_strings = {}
 		for m in re.finditer(r'\[(\S+)\]', s):
@@ -96,7 +109,14 @@ class GameData:
 				extra_strings[var] = self.strings[var]
 			except KeyError:
 				if var.startswith('LINK_'):
-					extra_strings[var] = self.strings[var[len('LINK_'):] + '_NAME']
+					base = var[len('LINK_'):]
+					try:
+						extra_strings[var] = self.strings[base + '_NAME']
+					except KeyError:
+						if base in self.TOOLTIP_NAME_MAP:
+							extra_strings[var] = self.strings[self.TOOLTIP_NAME_MAP[base]]
+						else:
+							extra_strings[var] = self.strings['UI_TOOLTIP_%s_NAME' % base]
 		return extra_strings
 
 def parse_translation(f: typing.TextIO) -> dict[str, str]:
@@ -105,7 +125,7 @@ def parse_translation(f: typing.TextIO) -> dict[str, str]:
 		if line in ('\n', 'END'):
 			continue
 		key, value = line.rstrip('\n').split('=', 1)
-		if key.startswith('SKILL_') and key in strings:
+		if (key.startswith('SKILL_') or key.startswith('EFFECT_')) and key in strings:
 			continue
 		assert key not in strings, '%r seen twice' % key
 		strings[key] = value
