@@ -43,14 +43,17 @@ class GameData:
 		with open('extracted/ArtifactData', 'r', encoding='utf-8') as f:
 			artifact_data = json.load(f)['Artifacts']
 			for artifact in artifact_data:
+				if not artifact.get('isDiscoverable', True): # airene's tower blessing
+					continue
 				try:
 					name = self.resolve_string(artifact['ArtifactName'])
 				except KeyError:
 					continue
-				self.artifacts[artifact['Key']] = artifact
+				key = artifact['Key']
+				self.artifacts[key] = artifact
 				if 'DropRate' in artifact:
 					artifact['DropRate'] *= 1.7 # ArtifactDataController.LoadArtifactDataCO
-				artifact_name_to_keys[name].append(artifact['Key'])
+				artifact_name_to_keys[name].append(key)
 		for name, keys in artifact_name_to_keys.items():
 			rarities = {self.artifacts[key].get('Rarity') for key in keys}
 			(rarity,) = rarities
@@ -61,7 +64,7 @@ class GameData:
 				artifact = self.artifacts[key]
 				if artifact.get('isDivine'):
 					divinable = True
-				elif artifact.get('isDiscoverable', True):
+				else:
 					bases.append(artifact)
 				key_list.append({'key': key, 'maxAnomaly': artifact.get('maxAnomaly')})
 			if divinable:

@@ -159,8 +159,6 @@ class Artifacts {
 		section.appendChild(desc);
 
 		const propHTML = [];
-		if (artifact['isDiscoverable'] === false)
-			propHTML.push('not discoverable');
 		if (artifact['HiddenItemLevel'])
 			propHTML.push('item level: ' + artifact['HiddenItemLevel']);
 		if (artifact['droppedBossName']) {
