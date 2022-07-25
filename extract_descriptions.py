@@ -95,9 +95,19 @@ public class DamageData {
 		Nemesis = 4,
 	}
 }
+static Dictionary<string, string> translations = new Dictionary<string, string>();
+foreach (string filename in new string[]{"ARTIFACT", "ATTRIBUTE", "CONTEXT"}) {
+	foreach (string line in File.ReadLines("extracted/" + filename)) {
+		if (line == "END") break;
+		if (line == "") continue;
+		string[] split = line.Split('=', 2);
+		if (translations.ContainsKey(split[0])) continue;
+		translations[split[0]] = split[1];
+	}
+}
 class LocalizedString {
 	public LocalizedString(string name) {
-		this.localizedString = '[' + name + ']';
+		this.localizedString = translations[name];
 	}
 	public string localizedString;
 }
