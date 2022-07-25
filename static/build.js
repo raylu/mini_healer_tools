@@ -158,11 +158,12 @@
 	function showItems() {
 		if (selectedItems.childElementCount === 0) {
 			// this may be the first time we're showing items
-			for (const key of build['items']) {
+			for (const [key, anomaly] of build['items']) {
 				const section = document.createElement('section');
 				section.classList.add('artifact');
 				section.dataset['key'] = key;
-				artifacts.load(key, section);
+				section.dataset['anomaly'] = anomaly;
+				artifacts.load(key, anomaly, section);
 				renderSelectedItem(section);
 			}
 		}
@@ -174,11 +175,14 @@
 	function artifactsCB(keys, name) {
 		pendingItem.innerHTML = '';
 		for (const key of keys) {
-			const section = document.createElement('section');
-			section.classList.add('artifact');
-			section.dataset['key'] = key;
-			artifacts.load(key, section);
-			pendingItem.appendChild(section);
+			for (let anomaly = 0; anomaly <= (key['maxAnomaly'] || 0); anomaly++) {
+				const section = document.createElement('section');
+				section.classList.add('artifact');
+				section.dataset['key'] = key['key'];
+				section.dataset['anomaly'] = anomaly;
+				artifacts.load(key['key'], anomaly, section);
+				pendingItem.appendChild(section);
+			}
 		}
 	}
 
@@ -198,7 +202,8 @@
 		renderSelectedItem(target);
 
 		const key = target.dataset['key'];
-		build['items'].push(key);
+		const anomaly = target.dataset['anomaly'];
+		build['items'].push([key, anomaly]);
 		updateURL(build);
 	});
 
@@ -217,7 +222,8 @@
 		const section = event.target.parentElement;
 		section.remove();
 
-		build['items'] = build['items'].filter(key => key !== section.dataset['key']);
+		build['items'] = build['items'].filter(([key, anomaly]) =>
+			key !== section.dataset['key'] || anomaly !== section.dataset['anomaly']);
 		updateURL(build);
 	});
 

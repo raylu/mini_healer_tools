@@ -13,11 +13,20 @@ def extract_attributes(dotnet_script_path: str, artifacts: typing.Sequence[dict]
 			f.write('a[%d].Key = "%s";\n' % (i, artifact['Key']))
 			if artifact.get('isDivine'):
 				f.write('a[%d].isDivine = true;\n' % i)
+			if 'maxAnomaly' in artifact:
+				f.write('a[%d].maxAnomaly = %d;\n' % (i, artifact['maxAnomaly']))
 		f.write('''
-Dictionary<string, List<ArtifactAttribute>> attributes = new Dictionary<string, List<ArtifactAttribute>>(a.Length);
+Dictionary<string, List<List<ArtifactAttribute>>> attributes = new Dictionary<string, List<List<ArtifactAttribute>>>(a.Length);
 foreach (Artifact artifact in a) {
-	List<ArtifactAttribute> aa = getArtifactBaseAttributes(artifact, null);
-	attributes[artifact.Key] = aa;
+	List<List<ArtifactAttribute>> anomArtifactAttrs = new List<List<ArtifactAttribute>>();
+	for (int anom = 0; anom <= artifact.maxAnomaly; anom++) {
+		ArtifactSaveInfo saveInfo = null;
+		if (artifact.maxAnomaly > 0) {
+			saveInfo = new ArtifactSaveInfo { anomaly = anom };
+		}
+		anomArtifactAttrs.Add(getArtifactBaseAttributes(artifact, saveInfo));
+	}
+	attributes[artifact.Key] = anomArtifactAttrs;
 }
 public class AttributeJsonConverter : System.Text.Json.Serialization.JsonConverter<ArtifactAttribute> {
 	public override void Write(System.Text.Json.Utf8JsonWriter writer, ArtifactAttribute attr, System.Text.Json.JsonSerializerOptions options) {
@@ -47,6 +56,7 @@ def write_csx(f: typing.TextIO) -> None:
 public struct Artifact {
 	public string Key;
 	public bool isDivine;
+	public int maxAnomaly;
 }
 public struct ArtifactSaveAttribute { public ArtifactAttribute.AddedType addedType; public ArtifactAttribute.AttriubteType attributeType; }
 public class ArtifactSaveInfo { public int anomaly; public List<ArtifactSaveAttribute> SaveAttributes; }

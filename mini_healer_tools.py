@@ -11,7 +11,7 @@ import copy
 import json
 import mimetypes
 
-from pigwig import PigWig, Response
+from pigwig import PigWig, Request, Response
 from pigwig.exceptions import HTTPException
 
 import export_image
@@ -38,15 +38,16 @@ def export_build(request):
 def get_artifact_names(request):
 	return Response.json(data.artifact_names)
 
-def get_artifact(request, key: str):
+def get_artifact(request: Request, key: str):
 	try:
 		artifact = copy.copy(data.artifacts[key])
 	except KeyError:
 		raise HTTPException(404, '%r not found\n' % key) # pylint: disable=raise-missing-from
 
+	anomaly = int(request.query.get('anomaly', 0))
 	if 'ArtifactName' in artifact:
 		artifact['ArtifactName'] = data.resolve_string(artifact['ArtifactName'])
-	artifact['attributes'] = copy.deepcopy(data.artifact_attributes[artifact['Key']])
+	artifact['attributes'] = copy.deepcopy(data.artifact_attributes[artifact['Key']][anomaly])
 	artifact['strings'] = {}
 
 	for attr in artifact['attributes']:
@@ -63,8 +64,8 @@ def get_artifact(request, key: str):
 			attr['postText'] = data.resolve_string(attr['postText'])
 
 	if 'specialDesc' in artifact:
-		artifact['specialDesc'] = '<br>'.join(data.artifact_descriptions[artifact['Key']])
-		artifact['strings'].update(data.fetch_strings(artifact['specialDesc']))
+		artifact['description'] = '<br>'.join(data.artifact_descriptions[artifact['Key']][anomaly])
+		artifact['strings'].update(data.fetch_strings(artifact['description']))
 	return Response.json(artifact)
 
 def get_talents(request):

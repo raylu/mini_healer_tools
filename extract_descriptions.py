@@ -24,14 +24,23 @@ def extract_descriptions(dotnet_script_path: str, artifacts: typing.Sequence[dic
 					raise AssertionError('unexpected type %s for %r %r' % (type(v), artifact['Key'], k))
 				f.write('a[%d].%s = %s;\n' % (i, k, v))
 		f.write('''
-Dictionary<string, List<string>> descriptions = new Dictionary<string, List<string>>(a.Length);
+Dictionary<string, List<List<string>>> descriptions = new Dictionary<string, List<List<string>>>(a.Length);
 static bool EmptyDesc(string s) { return s == "" || s == " "; }
 foreach (Artifact artifact in a) {
-	List<string> desc = getDescriptionByArtifact(artifact, 15, false);
-	desc.RemoveAll(EmptyDesc);
-	descriptions[artifact.Key] = desc;
+	List<List<string>> anomDescs = new List<List<string>>();
+	for (int anom = 0; anom <= artifact.maxAnomaly; anom++) {
+		ArtifactSaveInfo saveInfo = null;
+		if (artifact.maxAnomaly > 0) {
+			saveInfo = new ArtifactSaveInfo { anomaly = anom };
+		}
+		List<string> desc = getDescriptionByArtifact(artifact, 15, false, saveInfo=saveInfo);
+		desc.RemoveAll(EmptyDesc);
+		anomDescs.Add(desc);
+	}
+	descriptions[artifact.Key] = anomDescs;
 }
-File.WriteAllText("extracted/artifact_descriptions.json", System.Text.Json.JsonSerializer.Serialize(descriptions));
+var serializeOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+File.WriteAllText("extracted/artifact_descriptions.json", System.Text.Json.JsonSerializer.Serialize(descriptions, serializeOptions));
 ''')
 
 	subprocess.run([dotnet_script_path, '--verbosity=e', csx_path], check=True)

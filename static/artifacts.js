@@ -58,7 +58,7 @@ class Artifacts {
 			results.classList.remove('visible');
 			results.innerHTML = '';
 			const dataset = event.target.dataset;
-			const keys = dataset.keys.split(',');
+			const keys = JSON.parse(dataset.keys);
 			resultsCB(keys, dataset.name);
 		});
 
@@ -82,15 +82,18 @@ class Artifacts {
 					result.classList.add(this.rarities[rarity].toLowerCase());
 				result.innerText = name;
 				result.dataset.name = name;
-				result.dataset.keys = keys;
+				result.dataset.keys = JSON.stringify(keys);
 				results.appendChild(result);
 			}
 		}
 		results.classList.add('visible');
 	}
 
-	async load(key, section) {
-		const res = await fetch('/data/artifact/' + key);
+	async load(key, anomaly, section) {
+		let url = '/data/artifact/' + key;
+		if (anomaly > 0)
+			url += '?anomaly=' + anomaly;
+		const res = await fetch(url);
 		const artifact = await res.json();
 
 		const rarity = this.rarities[artifact['Rarity']];
@@ -151,8 +154,8 @@ class Artifacts {
 				line = `<span class="${attr['element']}">${line}</span>`;
 			desc.innerHTML += line + '<br>';
 		}
-		if (artifact['specialDesc'])
-			desc.innerHTML += '<br>' + artifact['specialDesc'].replaceAll(/\[\S+\]/g, replace);
+		if (artifact['description'])
+			desc.innerHTML += '<br>' + artifact['description'].replaceAll(/\[\S+\]/g, replace);
 		section.appendChild(desc);
 
 		const propHTML = [];
@@ -182,6 +185,8 @@ class Artifacts {
 			this.#addIcon(icons, 'divine');
 		else if (artifact['isDivinable'])
 			this.#addIcon(icons, 'divinable');
+		if (anomaly)
+			this.#addIcon(icons, 'anomalous');
 		section.appendChild(icons);
 	}
 
@@ -220,10 +225,12 @@ class Artifacts {
 		const main = document.querySelector('main');
 		main.innerHTML = '';
 		for (const key of keys) {
-			const section = document.createElement('section');
-			section.classList.add('artifact');
-			artifacts.load(key, section);
-			main.appendChild(section);
+			for (let anomaly = 0; anomaly <= (key['maxAnomaly'] || 0); anomaly++) {
+				const section = document.createElement('section');
+				section.classList.add('artifact');
+				artifacts.load(key['key'], anomaly, section);
+				main.appendChild(section);
+			}
 		}
 	}
 })();

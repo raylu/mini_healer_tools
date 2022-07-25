@@ -54,7 +54,7 @@ class GameData:
 		for name, keys in artifact_name_to_keys.items():
 			rarities = {self.artifacts[key].get('Rarity') for key in keys}
 			(rarity,) = rarities
-			self.artifact_names[name] = {'keys': keys, 'rarity': rarity}
+			key_list = []
 			bases = []
 			divinable = False
 			for key in keys:
@@ -63,9 +63,11 @@ class GameData:
 					divinable = True
 				elif artifact.get('isDiscoverable', True):
 					bases.append(artifact)
+				key_list.append({'key': key, 'maxAnomaly': artifact.get('maxAnomaly')})
 			if divinable:
 				(base,) = bases
 				base['isDivinable'] = True
+			self.artifact_names[name] = {'keys': key_list, 'rarity': rarity}
 		if artifact_descriptions:
 			with open('extracted/artifact_descriptions.json', 'r', encoding='utf-8') as f:
 				self.artifact_descriptions = json.load(f)
@@ -83,9 +85,10 @@ class GameData:
 				}
 		with open('extracted/artifact_attributes.json', 'r', encoding='utf-8') as f:
 			self.artifact_attributes = json.load(f)
-			for attr_list in self.artifact_attributes.values():
-				for attr in attr_list:
-					attr.update(attr_data[attr['type']])
+			for anoms in self.artifact_attributes.values():
+				for attr_list in anoms:
+					for attr in attr_list:
+						attr.update(attr_data[attr['type']])
 
 		with open('extracted/LevelData', 'r', encoding='utf-8') as f:
 			for level in json.load(f)['Levels']:
