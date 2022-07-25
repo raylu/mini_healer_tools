@@ -155,19 +155,23 @@ class Artifacts {
 			desc.innerHTML += '<br>' + artifact['specialDesc'].replaceAll(/\[\S+\]/g, replace);
 		section.appendChild(desc);
 
-		const props = document.createElement('div');
+		const propHTML = [];
+		if (artifact['isDiscoverable'] === false)
+			propHTML.push('not discoverable');
 		if (artifact['HiddenItemLevel'])
-			props.innerHTML += 'item level: ' + artifact['HiddenItemLevel'];
+			propHTML.push('item level: ' + artifact['HiddenItemLevel']);
 		if (artifact['droppedBossName']) {
-			props.innerHTML += '<br>dropped by: ' + artifact['droppedBossName'];
-			props.innerHTML += '<br>difficulty: ' + artifact['droppedBossDifficulty'];
+			propHTML.push('dropped by: ' + artifact['droppedBossName']);
+			propHTML.push('difficulty: ' + artifact['droppedBossDifficulty']);
 		}
 		if (artifact['DropRate']) {
 			const dropRate = artifact['DropRate'].toLocaleString(undefined,
 				{'minimumFractionDigits': 1, 'style': 'percent'});
-			props.innerHTML += '<br>drop rate: ' + dropRate;
+			propHTML.push('drop rate: ' + dropRate);
 		}
+		const props = document.createElement('div');
 		props.classList.add('props');
+		props.innerHTML = propHTML.join('<br>');
 		section.appendChild(props);
 
 		const icons = document.createElement('div');
