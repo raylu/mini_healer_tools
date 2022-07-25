@@ -48,6 +48,8 @@ class GameData:
 				except KeyError:
 					continue
 				self.artifacts[artifact['Key']] = artifact
+				if 'DropRate' in artifact:
+					artifact['DropRate'] *= 1.7 # ArtifactDataController.LoadArtifactDataCO
 				artifact_name_to_keys[name].append(artifact['Key'])
 		for name, keys in artifact_name_to_keys.items():
 			rarities = {self.artifacts[key].get('Rarity') for key in keys}

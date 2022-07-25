@@ -162,8 +162,11 @@ class Artifacts {
 			props.innerHTML += '<br>dropped by: ' + artifact['droppedBossName'];
 			props.innerHTML += '<br>difficulty: ' + artifact['droppedBossDifficulty'];
 		}
-		if (artifact['DropRate'])
-			props.innerHTML += '<br>drop rate: ' + artifact['DropRate'] * 100 + '%';
+		if (artifact['DropRate']) {
+			const dropRate = artifact['DropRate'].toLocaleString(undefined,
+				{'minimumFractionDigits': 1, 'style': 'percent'});
+			props.innerHTML += '<br>drop rate: ' + dropRate;
+		}
 		props.classList.add('props');
 		section.appendChild(props);
 	}
