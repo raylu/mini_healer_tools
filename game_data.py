@@ -55,6 +55,17 @@ class GameData:
 			rarities = {self.artifacts[key].get('Rarity') for key in keys}
 			(rarity,) = rarities
 			self.artifact_names[name] = {'keys': keys, 'rarity': rarity}
+			bases = []
+			divinable = False
+			for key in keys:
+				artifact = self.artifacts[key]
+				if artifact.get('isDivine'):
+					divinable = True
+				elif artifact.get('isDiscoverable', True):
+					bases.append(artifact)
+			if divinable:
+				(base,) = bases
+				base['isDivinable'] = True
 		if artifact_descriptions:
 			with open('extracted/artifact_descriptions.json', 'r', encoding='utf-8') as f:
 				self.artifact_descriptions = json.load(f)

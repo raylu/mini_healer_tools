@@ -169,6 +169,22 @@ class Artifacts {
 		}
 		props.classList.add('props');
 		section.appendChild(props);
+
+		const icons = document.createElement('div');
+		icons.classList.add('icons');
+		if (artifact['isChaotic'])
+			this.#addIcon(icons, 'chaotic');
+		if (artifact['isDivine'])
+			this.#addIcon(icons, 'divine');
+		else if (artifact['isDivinable'])
+			this.#addIcon(icons, 'divinable');
+		section.appendChild(icons);
+	}
+
+	#addIcon(container, name) {
+		const icon = document.createElement('img');
+		icon.src = `/static/artifact_${name}.png`;
+		container.appendChild(icon);
 	}
 }
 

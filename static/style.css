@@ -91,6 +91,9 @@ main.artifacts, div#pending_item, div#selected_items {
 	flex-wrap: wrap;
 	justify-content: space-evenly;
 }
+main section.artifact {
+	position: relative; /* for div.icons and div.delete */
+}
 main section.artifact div.icon {
 	margin: 0 auto 0.25em;
 	width: 64px;
@@ -165,6 +168,12 @@ main section.artifact div.desc span.link {
 main section.artifact div.props {
 	color: #777;
 }
+main section.artifact div.icons {
+	position: absolute;
+	width: 32px;
+	left: -10px;
+	top: 64px;
+}
 
 header.build {
 	display: flex;
@@ -213,9 +222,6 @@ main.build div.info div.desc {
 	margin-bottom: 1em;
 }
 
-main.build div.items div#selected_items section.artifact {
-	position: relative; /* for div.delete */
-}
 main.build div.items div#selected_items section.artifact div.delete {
     position: absolute;
 	top: 10px;

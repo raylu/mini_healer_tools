@@ -3,6 +3,10 @@
 /raw
 /static/artifacts/
 /static/artifact_frame.png
+/static/artifact_anomalous.png
+/static/artifact_chaotic.png
+/static/artifact_divinable.png
+/static/artifact_divine.png
 /static/favicon.png
 /static/talents/
 __pycache__/

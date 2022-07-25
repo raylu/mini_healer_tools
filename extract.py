@@ -49,6 +49,10 @@ def main():
 	static_assets = [
 		('Texture2D/Wisdom Tomes.png', 'static/favicon.png'),
 		('Texture2D/Frame.png', 'static/artifact_frame.png'),
+		('Resources/image/others/ARTIFACT_ANOMALOUS_ICON.png', 'static/artifact_anomalous.png'),
+		('Resources/image/others/ARTIFACT_CHAOTIC_ICON.png', 'static/artifact_chaotic.png'),
+		('Resources/image/others/ARTIFACT_DIVINABLE_ICON.png', 'static/artifact_divinable.png'),
+		('Resources/image/others/ARTIFACT_DIVINE_ICON.png', 'static/artifact_divine.png'),
 	]
 	for src, dest in static_assets:
 		try:
