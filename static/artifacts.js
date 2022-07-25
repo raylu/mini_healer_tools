@@ -100,7 +100,9 @@ class Artifacts {
 
 		const icon = document.createElement('div');
 		icon.classList.add('icon');
-		icon.style.backgroundImage = `url(/static/artifacts/${artifact['Key']}.png)`;
+		let iconFilename = artifact['Key'];
+		if (anomaly) iconFilename += '_ANOMALY' + anomaly;
+		icon.style.backgroundImage = `url(/static/artifacts/${iconFilename}.png)`;
 		const img = document.createElement('img');
 		img.src = '/static/artifact_frame.png';
 		img.classList.add(rarity.toLowerCase());

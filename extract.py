@@ -144,14 +144,15 @@ def extract_artifacts() -> dict:
 			key = key[:-len('_TOWER')]
 
 		try:
-			filename = icon_filenames[icon_names[key]]
+			filepath = icon_filenames[icon_names[key]]
 		except KeyError:
-			pass
+			found = False
 		else:
-			os.link(ASSETS_DIR + filename, output_path)
-			continue
+			os.link(ASSETS_DIR + filepath, output_path)
+			found = True
 
-		found = link_artifact_icon(key, output_path)
+		if not found:
+			found = link_artifact_icon(key, output_path)
 		if not found:
 			if artifact.get('isDivine'):
 				assert key.endswith('_DIVINE'), '%r is divine' % key
@@ -161,6 +162,11 @@ def extract_artifacts() -> dict:
 					key = key[:-len(anom_suffix)]
 					break
 			link_artifact_icon(key, output_path)
+
+		max_anomaly = artifact.get('maxAnomaly', 0)
+		for anomaly in range(1, max_anomaly + 1):
+			filename = '%s_ANOMALY%d.png' % (artifact['Key'], anomaly) # see Artifact.cs getIcon
+			os.link(ASSETS_DIR + 'Resources/image/artifacts/' + filename, 'static/artifacts/' + filename)
 
 	return artifact_data
 
