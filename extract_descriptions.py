@@ -97,7 +97,7 @@ public class DamageData {
 }
 class LocalizedString {
 	public LocalizedString(string name) {
-		this.localizedString = name;
+		this.localizedString = '[' + name + ']';
 	}
 	public string localizedString;
 }

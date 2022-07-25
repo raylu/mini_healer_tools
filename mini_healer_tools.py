@@ -10,6 +10,7 @@ if len(sys.argv) == 3:
 import copy
 import json
 import mimetypes
+import re
 
 from pigwig import PigWig, Request, Response
 from pigwig.exceptions import HTTPException
@@ -64,8 +65,11 @@ def get_artifact(request: Request, key: str):
 			attr['postText'] = data.resolve_string(attr['postText'])
 
 	if 'specialDesc' in artifact:
-		artifact['description'] = '<br>'.join(data.artifact_descriptions[artifact['Key']][anomaly])
-		artifact['strings'].update(data.fetch_strings(artifact['description']))
+		description = '<br>'.join(data.artifact_descriptions[artifact['Key']][anomaly])
+		if re.fullmatch(r'\[[A-Z0-9_]+\]', description): # anomalous artifacts have translations
+			description = data.strings[description[1:-1]]
+		artifact['description'] = description
+		artifact['strings'].update(data.fetch_strings(description))
 	return Response.json(artifact)
 
 def get_talents(request):

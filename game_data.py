@@ -116,7 +116,7 @@ class GameData:
 
 	def resolve_string(self, s: str) -> str:
 		value = self.strings[s]
-		if re.fullmatch(r'\[[A-Z_]+\]', value):
+		if re.fullmatch(r'\[[A-Z0-9_]+\]', value):
 			value = self.strings[value[1:-1]]
 		return value
 
