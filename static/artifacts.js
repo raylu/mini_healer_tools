@@ -127,7 +127,7 @@ class Artifacts {
 			const replacement = artifact['strings'][textVar];
 			if (!replacement)
 				return needle;
-			else if (textVar.substr(0, 5) === 'LINK_')
+			else if (textVar.substring(0, 5) === 'LINK_')
 				return `<span class="link">${replacement}</span>`;
 			else
 				return replacement;
@@ -166,18 +166,22 @@ class Artifacts {
 }
 
 (async () => {
-	if (window.location.pathname.substr(0, 10) !== '/artifacts')
+	if (window.location.pathname.substring(0, 10) !== '/artifacts')
 		return;
 
 	const artifacts = new Artifacts();
 	await artifacts.fetchArtifactNames();
 	artifacts.setupSearch(resultsCB);
 
-	if (window.location.pathname.substr(0, 11) === '/artifacts/') {
-		const name = decodeURIComponent(window.location.pathname.substr(11));
+	function handlePopState() {
+		const name = decodeURIComponent(window.location.pathname.substring(11));
 		loadKeys(artifacts.artifactNames[name]['keys']);
 		const searchInput = document.querySelector('form#search input[name=q]');
 		searchInput.value = name;
+	}
+	if (window.location.pathname.substring(0, 11) === '/artifacts/') {
+		handlePopState();
+		addEventListener('popstate', handlePopState);
 	}
 
 	function resultsCB(keys, name) {
