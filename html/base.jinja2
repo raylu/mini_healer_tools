@@ -6,8 +6,11 @@
 		<link rel="icon" href="/static/favicon.png">
 	</head>
 	<body>
-		{% block body %}
-		{% endblock body %}
+		{% if not no_back_button %}
+			<a href="/" class="back">←</a>
+		{% endif %}
+
+		{% block body %}{% endblock body %}
 
 		<footer>
 			<a href="https://github.com/raylu/mini_healer_tools">github.com/raylu/mini_healer_tools</a>

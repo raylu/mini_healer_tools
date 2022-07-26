@@ -16,6 +16,12 @@ a:hover {
 	color: #5ad;
 }
 
+a.back {
+	display: inline-block;
+	font-size: 36px;
+	margin-left: 20px;
+}
+
 input {
 	background-color: #111;
 	color: inherit;

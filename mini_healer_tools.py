@@ -19,7 +19,7 @@ import export_image
 import game_data
 
 def root(request):
-	return Response.render(request, 'index.jinja2', {})
+	return Response.render(request, 'index.jinja2', {'no_back_button': True})
 
 def artifacts_page(request, name=None):
 	return Response.render(request, 'artifacts.jinja2', {})
