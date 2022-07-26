@@ -1,30 +1,46 @@
 'use strict';
-/* global Artifacts, JsonURL */
+/* global Artifacts, JsonURL, reef */
 (async () => {
 	async function fetchTalents() {
 		const res = await fetch('/data/talents');
 		return await res.json();
 	}
 	const talents = await fetchTalents();
-	const build = parseURL();
+	const build = reef.store(parseURL());
 
-	const header = document.querySelector('header');
 	const classes = {
 		'Druid': 0,
 		'Priest': 1,
 		'Occultist': 2,
 		'Paladin': 5,
 	};
-	for (const [cl, i] of Object.entries(classes)) {
-		const h2 = document.createElement('h2');
-		h2.innerText = cl;
-		h2.dataset.treeIndex = i;
-		header.appendChild(h2);
-		h2.addEventListener('click', () => showTree(i));
+	function renderHeader() {
+		// map class numbers to points spent in that class
+		const classPoints = Object.fromEntries(Object.values(classes).map(clNum => [clNum, 0]));
+		for (const [urlKey, count] of Object.entries(build['talents']))
+			classPoints[urlKey >> 7] += count;
+
+		const headers = Object.entries(classes).map(([cl, i]) => {
+			const points = classPoints[i];
+			if (points > 0)
+				return `<h2 data-treeindex="${i}">${cl} (${points})</h2>`;
+			else
+				return `<h2 data-treeindex="${i}">${cl}</h2>`;
+		});
+		headers.push('<h2>Items</h2>');
+		return headers.join('');
 	}
-	header.appendChild(document.createElement('h2'));
-	header.children[4].innerText = 'Items';
-	header.children[4].addEventListener('click', showItems);
+	document.querySelector('header').addEventListener('click', (event) => {
+		if (event.target.tagName != 'H2')
+			return;
+		const treeIndex = event.target.dataset.treeindex;
+		if (treeIndex === undefined)
+			showItems();
+		else
+			showTree(Number(treeIndex));
+	});
+	reef.component('header', renderHeader);
+
 	const artifacts = new Artifacts();
 	await artifacts.fetchArtifactNames();
 	artifacts.setupSearch(artifactsCB);
