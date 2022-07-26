@@ -10,7 +10,6 @@ if len(sys.argv) == 3:
 import copy
 import json
 import mimetypes
-import re
 
 from pigwig import PigWig, Request, Response
 from pigwig.exceptions import HTTPException
