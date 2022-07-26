@@ -63,35 +63,40 @@
 	const tree = document.querySelector('main div.tree');
 	const info = document.querySelector('main div.info');
 	const items = document.querySelector('main div.items');
+	let currentTree = null;
 	function showTree(index) {
 		main.innerHTML = '';
 		tree.innerHTML = '';
 		info.innerHTML = '';
+		main.appendChild(tree);
+		main.appendChild(info);
+
+		if (currentTree !== null)
+			currentTree['component'].stop();
+		currentTree = {'index': index};
+		currentTree['component'] = reef.component('main div.tree', renderTree);
+	}
+	function renderTree() {
+		const {index} = currentTree;
+		const divs = [];
 		for (const talent of Object.values(talents['talents'])) {
 			if (talent['Type'] !== index)
 				continue;
-			const talentDiv = document.createElement('div');
-			talentDiv.classList.add('talent');
-			talentDiv.dataset.key = talent['Key'];
-			talentDiv.style.gridRow = talent['tier'];
-			talentDiv.style.gridColumn = talent['Position'] + 1;
-
-			const img = document.createElement('img');
-			img.src = `/static/talents/${talent['Key']}.png`;
-			talentDiv.appendChild(img);
 
 			const points = build['talents'][talentUrlKey(talent)] || 0;
-			talentDiv.append(points);
+			const classes = ['talent'];
 			if (points > 0) {
-				talentDiv.classList.add('allocated');
+				classes.push('allocated');
 				if (points === talent['maxLevel'])
-					talentDiv.classList.add('maxed');
+					classes.push('maxed');
 			}
-
-			tree.appendChild(talentDiv);
+			divs.push(`<div class="${classes.join(' ')}" data-key="${talent['Key']}"
+					style="grid-row: ${talent['tier']}; grid-column: ${talent['Position'] + 1}">
+				<img src="/static/talents/${talent['Key']}.png">
+				${points}
+			</div>`);
 		}
-		main.appendChild(tree);
-		main.appendChild(info);
+		return divs.join('');
 	}
 
 	tree.addEventListener('click', (event) => handleTalentClick(event, true));
@@ -120,19 +125,11 @@
 			if (points > 0)
 				points--;
 		}
-		if (points > 0) {
+		if (points > 0)
 			selectedTalents[urlKey] = points;
-			target.classList.add('allocated');
-			if (points === talent['maxLevel'])
-				target.classList.add('maxed');
-			else
-				target.classList.remove('maxed');
-		} else {
+		else
 			delete selectedTalents[urlKey];
-			target.classList.remove('allocated');
-		}
 
-		target.childNodes[1].textContent = points;
 		updateURL(build);
 	}
 
@@ -172,6 +169,9 @@
 	const pendingItem = document.querySelector('main .items #pending_item');
 	const selectedItems = document.querySelector('main .items #selected_items');
 	function showItems() {
+		if (currentTree !== null)
+			currentTree['component'].stop();
+
 		if (selectedItems.childElementCount === 0) {
 			// this may be the first time we're showing items
 			for (const [key, anomaly] of build['items']) {
