@@ -74,23 +74,39 @@
 		if (currentTree !== null)
 			currentTree['component'].stop();
 		currentTree = {'index': index};
-		currentTree['component'] = reef.component('main div.tree', renderTree);
+		currentTree['component'] = reef.component('main div.tree', renderTalents);
 	}
-	function renderTree() {
+	function renderTalents() {
 		const {index} = currentTree;
-		const divs = [];
-		for (const talent of Object.values(talents['talents'])) {
-			if (talent['Type'] !== index)
-				continue;
 
-			const points = build['talents'][talentUrlKey(talent)] || 0;
+		const treeTalents = [];
+		for (const talent of Object.values(talents['talents']))
+			if (talent['Type'] === index) {
+				const points = build['talents'][talentUrlKey(talent)] || 0;
+				treeTalents.push([talent, points]);
+			}
+
+		// figure out how many talents were spent in each tier
+		// talents are not in tier order so we must do this prior to checking 'unreachable'
+		let tierPoints = Array(10).fill(0);
+		for (const [talent, points] of treeTalents)
+			tierPoints[talent['tier'] - 1] += points;
+		// sum previous tiers into each tier
+		for (let i = 1; i < tierPoints.length; i++)
+			tierPoints[i] += tierPoints[i-1];
+
+		const divs = [];
+		for (const [talent, points] of treeTalents) {
 			const classes = ['talent'];
 			if (points > 0) {
 				classes.push('allocated');
-				if (points === talent['maxLevel'])
+				if (tierPoints[talent['tier'] - 2] < 4 * (talent['tier'] - 1))
+					classes.push('unreachable');
+				else if (points === talent['maxLevel'])
 					classes.push('maxed');
 			}
-			divs.push(`<div class="${classes.join(' ')}" data-key="${talent['Key']}"
+			divs.push(`
+			<div class="${classes.join(' ')}" data-key="${talent['Key']}"
 					style="grid-row: ${talent['tier']}; grid-column: ${talent['Position'] + 1}">
 				<img src="/static/talents/${talent['Key']}.png">
 				${points}

@@ -221,6 +221,9 @@ main.build div.tree .talent.allocated {
 main.build div.tree .talent.allocated.maxed {
 	background-color: #495;
 }
+main.build div.tree .talent.allocated.unreachable {
+	background-color: #a33;
+}
 main.build div.tree .talent img {
 	width: 64px;
 	height: 64px;
