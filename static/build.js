@@ -27,7 +27,10 @@
 			else
 				return `<h2 data-treeindex="${i}">${cl}</h2>`;
 		});
-		headers.push('<h2>Items</h2>');
+		if (build['items'].length > 0)
+			headers.push(`<h2>Items (${build['items'].length})</h2>`);
+		else
+			headers.push('<h2>Items</h2>');
 		return headers.join('');
 	}
 	document.querySelector('header').addEventListener('click', (event) => {
