@@ -82,7 +82,10 @@ def _draw_artifacts(data: game_data.GameData, items: list[list]) -> PIL.Image.Im
 		artifact = data.artifacts[key]
 
 		image.paste(frame, (0, y_offset))
-		with PIL.Image.open('static/artifacts/%s.png' % artifact['Key']) as icon:
+		icon_filename = artifact['Key']
+		if anomaly:
+			icon_filename += '_ANOMALY%d' % anomaly
+		with PIL.Image.open('static/artifacts/%s.png' % icon_filename) as icon:
 			resized = icon.resize((32, 32))
 			image.paste(resized, (12, y_offset + 12), resized)
 
