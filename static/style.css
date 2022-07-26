@@ -253,10 +253,13 @@ main.build div.items div#pending_item section.artifact:hover {
 	background-color: #222;
 }
 
-form#export {
+form#build {
 	margin: 25px auto;
-	width: 200px;
+	width: 300px;
 	text-align: center;
+}
+form#build input {
+	margin-right: 30px;
 }
 
 footer {

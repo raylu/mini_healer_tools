@@ -227,8 +227,17 @@
 		updateURL(build);
 	});
 
-	document.querySelector('form#export').addEventListener('formdata', (event) => {
+	document.querySelector('form#build').addEventListener('formdata', (event) => {
 		event.formData.set('build', JSON.stringify(build));
+	});
+
+	document.querySelector('form#build input#reset').addEventListener('click', (event) => {
+		Object.assign(build, {
+			'talents': {},
+			'items': [],
+		});
+		updateURL(build);
+		showTree(0);
 	});
 
 	showTree(0);
