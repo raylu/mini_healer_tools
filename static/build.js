@@ -202,7 +202,7 @@
 		renderSelectedItem(target);
 
 		const key = target.dataset['key'];
-		const anomaly = target.dataset['anomaly'];
+		const anomaly = Number(target.dataset['anomaly']);
 		build['items'].push([key, anomaly]);
 		updateURL(build);
 	});

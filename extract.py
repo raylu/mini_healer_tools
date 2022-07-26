@@ -46,6 +46,8 @@ def main():
 			'extracted/TalentData')
 	os.link(ASSETS_DIR + 'Resources/fonts/raw/indienovaBC-Regular-12px.ttf',
 			'extracted/indienovaBC-Regular-12px.ttf')
+	os.link(ASSETS_DIR + 'Resources/fonts/raw/NormalTextPixelFont.ttf',
+			'extracted/NormalTextPixelFont.ttf')
 	static_assets = [
 		('Texture2D/Wisdom Tomes.png', 'static/favicon.png'),
 		('Texture2D/Frame.png', 'static/artifact_frame.png'),
