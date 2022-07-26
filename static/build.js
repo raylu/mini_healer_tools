@@ -55,9 +55,9 @@
 		}
 		return parsedBuild;
 	}
-	function updateURL(buildData) {
-		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify(buildData, {AQF: true, noEmptyComposite: true}));
-	}
+	addEventListener('reef:store', () => {
+		history.replaceState({}, '', '/build/?s=' + JsonURL.stringify(build, {AQF: true, noEmptyComposite: true}));
+	});
 
 	const main = document.querySelector('main');
 	const tree = document.querySelector('main div.tree');
@@ -130,7 +130,6 @@
 		else
 			delete selectedTalents[urlKey];
 
-		updateURL(build);
 	}
 
 	function talentUrlKey(talent) {
@@ -220,7 +219,6 @@
 		const key = target.dataset['key'];
 		const anomaly = Number(target.dataset['anomaly']);
 		build['items'].push([key, anomaly]);
-		updateURL(build);
 	});
 
 	function renderSelectedItem(element) {
@@ -231,6 +229,7 @@
 		selectedItems.appendChild(element);
 	}
 
+	// handle item deletion
 	selectedItems.addEventListener('click', (event) => {
 		if (event.target.tagName !== 'DIV' || !event.target.classList.contains('delete'))
 			return;
@@ -238,9 +237,9 @@
 		const section = event.target.parentElement;
 		section.remove();
 
-		build['items'] = build['items'].filter(([key, anomaly]) =>
-			key !== section.dataset['key'] || anomaly !== section.dataset['anomaly']);
-		updateURL(build);
+		// can't overwrite 'items' with a filtered array or reef won't pick up the update
+		build['items'].splice(build['items'].findIndex(([key, anomaly]) =>
+			key === section.dataset['key'] || anomaly === section.dataset['anomaly']));
 	});
 
 	document.querySelector('form#build').addEventListener('formdata', (event) => {
@@ -252,7 +251,6 @@
 			'talents': {},
 			'items': [],
 		});
-		updateURL(build);
 		showTree(0);
 	});
 
