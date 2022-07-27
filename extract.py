@@ -54,6 +54,7 @@ def main():
 	static_assets = [
 		('Texture2D/Wisdom Tomes.png', 'static/favicon.png'),
 		('Texture2D/Frame.png', 'static/artifact_frame.png'),
+		('Texture2D/RUNE.png', 'static/runes.png'),
 		('Resources/image/others/ARTIFACT_ANOMALOUS_ICON.png', 'static/artifact_anomalous.png'),
 		('Resources/image/others/ARTIFACT_CHAOTIC_ICON.png', 'static/artifact_chaotic.png'),
 		('Resources/image/others/ARTIFACT_DIVINABLE_ICON.png', 'static/artifact_divinable.png'),

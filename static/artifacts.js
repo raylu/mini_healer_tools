@@ -100,9 +100,13 @@ class Artifacts {
 
 		const icon = document.createElement('div');
 		icon.classList.add('icon');
-		let iconFilename = artifact['Key'];
-		if (anomaly) iconFilename += '_ANOMALY' + anomaly;
-		icon.style.backgroundImage = `url(/static/artifacts/${iconFilename}.png)`;
+		if (artifact['isRuneword'])
+			icon.style.backgroundImage = 'url(/static/runes.png)';
+		else {
+			let iconFilename = artifact['Key'];
+			if (anomaly) iconFilename += '_ANOMALY' + anomaly;
+			icon.style.backgroundImage = `url(/static/artifacts/${iconFilename}.png)`;
+		}
 		const img = document.createElement('img');
 		img.src = '/static/artifact_frame.png';
 		img.classList.add(rarity.toLowerCase());
@@ -115,10 +119,13 @@ class Artifacts {
 		section.appendChild(name);
 
 		const type = document.createElement('div');
-		const types = [
-			this.types[artifact['Type']],
-		];
-		if (artifact['Rarity']) types.push(rarity);
+		const types = [];
+		if (artifact['isRuneword'])
+			types.push('Runic');
+		else {
+			types.push(this.types[artifact['Type']]);
+			if (artifact['Rarity']) types.push(rarity);
+		}
 		if (artifact['isUltraRare']) types.push('Ultra Rare');
 		if (artifact['isChaotic']) types.push('Chaotic');
 		type.innerHTML = types.join(', ');
