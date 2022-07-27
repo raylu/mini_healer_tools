@@ -179,6 +179,8 @@ class Artifacts {
 				{'minimumFractionDigits': 1, 'style': 'percent'});
 			propHTML.push('drop rate: ' + dropRate);
 		}
+		if (artifact['isRuneword'])
+			propHTML.push('runes: ' + artifact['runes'].join(', '));
 		const props = document.createElement('div');
 		props.classList.add('props');
 		props.innerHTML = propHTML.join('<br>');

@@ -24,7 +24,7 @@ class Difficulty(enum.IntEnum):
 	BRUTAL = 1
 	INSANE = 2
 
-TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'BOSS', 'CONTEXT', 'EFFECT', 'SKILL', 'TALENT', 'UI']
+TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'BOSS', 'CONTEXT', 'EFFECT', 'MATERIAL', 'SKILL', 'TALENT', 'UI']
 
 class GameData:
 	def __init__(self, artifact_descriptions=True):
@@ -78,21 +78,28 @@ class GameData:
 		with open('extracted/artifact_attributes.json', 'r', encoding='utf-8') as f:
 			self.artifact_attributes: dict[list[list[dict]]] = json.load(f)
 
+		material_names: dict[str, str] = {}
+		with open('extracted/MaterialData', 'r', encoding='ascii') as f:
+			for material in json.load(f)['Materials']:
+				material_names[material['Key']] = self.strings[material['Name']]
 		with open('extracted/runewords.json', 'r', encoding='ascii') as f:
-			runewords = json.load(f)
+			runewords: list[dict] = json.load(f)
 		for runeword in runewords:
 			key = ''.join(runeword['rune_key'])
+			runes = [material_names[rune] for rune in runeword['rune_key']]
 			self.artifacts[key] = {
 				'ArtifactName': runeword['title'],
 				'Key': key,
 				'isRuneword': True,
 				'Rarity': 3, # unique
 				'specialDesc': True,
+				'runes': runes,
 			}
 			name = self.strings[runeword['title']]
 			self.artifact_names[name] = {'keys': [{'key': key, 'maxAnomaly': None}], 'rarity': None}
 			self.artifact_attributes[key] = [runeword['attributes']]
-			self.artifact_descriptions[key] = [runeword['special_desc']]
+			if artifact_descriptions:
+				self.artifact_descriptions[key] = [runeword['special_desc']]
 
 		with open('extracted/AttributesData', 'r', encoding='utf-8') as f:
 			attr_data: dict[int, dict] = {}
