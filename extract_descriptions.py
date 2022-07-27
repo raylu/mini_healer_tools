@@ -3,6 +3,24 @@ import subprocess
 import typing
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
+LOCALIZED_STRING = '''
+static Dictionary<string, string> translations = new Dictionary<string, string>();
+foreach (string filename in new string[]{"ARTIFACT", "ATTRIBUTE", "CONTEXT"}) {
+	foreach (string line in File.ReadLines("extracted/" + filename)) {
+		if (line == "END") break;
+		if (line == "") continue;
+		string[] split = line.Split('=', 2);
+		if (translations.ContainsKey(split[0])) continue;
+		translations[split[0]] = split[1];
+	}
+}
+class LocalizedString {
+	public LocalizedString(string name) {
+		this.localizedString = translations[name];
+	}
+	public string localizedString;
+}
+'''
 
 def extract_descriptions(dotnet_script_path: str, artifacts: typing.Sequence[dict]):
 	csx_path = 'extracted/ArtifactDescriptions.csx'
@@ -95,22 +113,6 @@ public class DamageData {
 		Nemesis = 4,
 	}
 }
-static Dictionary<string, string> translations = new Dictionary<string, string>();
-foreach (string filename in new string[]{"ARTIFACT", "ATTRIBUTE", "CONTEXT"}) {
-	foreach (string line in File.ReadLines("extracted/" + filename)) {
-		if (line == "END") break;
-		if (line == "") continue;
-		string[] split = line.Split('=', 2);
-		if (translations.ContainsKey(split[0])) continue;
-		translations[split[0]] = split[1];
-	}
-}
-class LocalizedString {
-	public LocalizedString(string name) {
-		this.localizedString = translations[name];
-	}
-	public string localizedString;
-}
 class UtilsManager { public static string addHoverTooltip(string s, bool addHoverTooltip) { return s; } }
 class Mathf {
 	public static int RoundToInt(float f) {
@@ -118,20 +120,23 @@ class Mathf {
 	}
 }
 ''')
-	f.writelines(adc_lines())
+	f.write(LOCALIZED_STRING)
+	f.writelines(adc_lines(quality_delta=True))
 	f.writelines(am_lines())
 	f.writelines(ogdc_class_lines())
 	f.write('static OtherGameDataController GDM = new OtherGameDataController();\n')
 	f.writelines(ogdc_dba_lines())
 
-def adc_lines() -> list[str]:
+def adc_lines(*, quality_delta: bool) -> list[str]:
 	lines = ['''
 public class ArtifactDataController {
-	public static float getQualityDeltaFloat(float min, float max, int quality)
-	{
-		return (float)System.Math.Round((min + (max - min) * ((float)quality / (float)OtherGameDataController.MaxQuality)) * 100f) / 100f;
-	}
 ''']
+	if quality_delta:
+		lines.append('''
+public static float getQualityDeltaFloat(float min, float max, int quality) {
+	return (float)System.Math.Round((min + (max - min) * ((float)quality / (float)OtherGameDataController.MaxQuality)) * 100f) / 100f;
+}
+''')
 	with open(ASSETS_DIR + '/MonoScript/Assembly-CSharp/ArtifactDataController.cs', 'r', encoding='ascii') as f:
 		lines.extend(extract_static_consts(f))
 	lines.append('}\n')

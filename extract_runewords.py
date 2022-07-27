@@ -2,6 +2,7 @@ import subprocess
 import typing
 
 import extract_attributes
+import extract_descriptions
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
 
@@ -13,6 +14,9 @@ def extract_runewords(dotnet_script_path: str):
 		f.write(extract_attributes.ATTRIBUTE_JSON_CONVERTER)
 		f.write('''
 SocketDataController.RefreshRunewordData();
+static bool EmptyDesc(string s) { return s == "" || s == " "; }
+foreach (Runeword rw in runeWords)
+	rw.specialDesc.RemoveAll(EmptyDesc);
 public class RunewordJsonConverter : System.Text.Json.Serialization.JsonConverter<Runeword> {
 	public override void Write(System.Text.Json.Utf8JsonWriter writer, Runeword rw, System.Text.Json.JsonSerializerOptions options) {
 		writer.WriteStartObject();
@@ -21,6 +25,11 @@ public class RunewordJsonConverter : System.Text.Json.Serialization.JsonConverte
 		writer.WriteStartArray("rune_key");
 		foreach (string rune in rw.runeKey)
 			writer.WriteStringValue(rune);
+		writer.WriteEndArray();
+
+		writer.WriteStartArray("special_desc");
+		foreach (string desc in rw.specialDesc)
+			writer.WriteStringValue(desc);
 		writer.WriteEndArray();
 
 		writer.WriteEndObject();
@@ -60,16 +69,21 @@ public class Runeword {
 	public List<string> specialDesc;
 	public Artifact.ArtifactSlotType slotType;
 }
-private static string getRunewordsName(string wordKey) { return null; }
 private static List<ArtifactAttribute> getRunewordsAttributes(string word) { return null; }
-private static List<string> getRunewordsSpecialDesc(string wordKey) { return null; }
 private static Runeword getRunewordEffect(Runeword runeword) { return runeword; }
 static List<Runeword> runeWords = new List<Runeword>();
 ''')
+	f.write(extract_descriptions.LOCALIZED_STRING)
 	f.writelines(extract_attributes.aa_lines())
+	f.writelines(extract_descriptions.adc_lines(quality_delta=False))
 	f.writelines(sdc_lines())
 
 def sdc_lines() -> list[str]:
+	function_needles = [
+		'void RefreshRunewordData()',
+		'string getRunewordsName',
+		'List<string> getRunewordsSpecialDesc',
+	]
 	lines  = ['public class SocketDataController {\n']
 	with open(ASSETS_DIR + '/MonoScript/Assembly-CSharp/SocketDataController.cs', 'r', encoding='ascii') as f:
 		in_func = False
@@ -77,7 +91,7 @@ def sdc_lines() -> list[str]:
 			if line == '\n':
 				continue
 
-			if not in_func and ('void RefreshRunewordData()' in line or 'string getRunewordsName' in line):
+			if not in_func and any(needle in line for needle in function_needles):
 				in_func = True
 			if ('static Runeword ' in line and 'new Runeword' in line) or in_func:
 				lines.append(line)

@@ -54,18 +54,6 @@ class GameData:
 				if 'DropRate' in artifact:
 					artifact['DropRate'] *= 1.7 # ArtifactDataController.LoadArtifactDataCO
 				artifact_name_to_keys[name].append(key)
-		with open('extracted/runewords.json', 'r', encoding='ascii') as f:
-			runewords = json.load(f)
-		for runeword in runewords:
-			key = ''.join(runeword['rune_key'])
-			self.artifacts[key] = {
-				'ArtifactName': runeword['title'],
-				'Key': key,
-				'isRuneword': True,
-				'Rarity': 3, # unique
-			}
-			name = self.strings[runeword['title']]
-			artifact_name_to_keys[name].append(key)
 		for name, keys in artifact_name_to_keys.items():
 			rarities = {self.artifacts[key].get('Rarity') for key in keys}
 			(rarity,) = rarities
@@ -104,8 +92,22 @@ class GameData:
 				for attr_list in anoms:
 					for attr in attr_list:
 						attr.update(attr_data[attr['type']])
+
+		with open('extracted/runewords.json', 'r', encoding='ascii') as f:
+			runewords = json.load(f)
 		for runeword in runewords:
-			self.artifact_attributes[''.join(runeword['rune_key'])] = [[]]
+			key = ''.join(runeword['rune_key'])
+			self.artifacts[key] = {
+				'ArtifactName': runeword['title'],
+				'Key': key,
+				'isRuneword': True,
+				'Rarity': 3, # unique
+				'specialDesc': True,
+			}
+			name = self.strings[runeword['title']]
+			self.artifact_names[name] = {'keys': [{'key': key, 'maxAnomaly': None}], 'rarity': None}
+			self.artifact_attributes[key] = [[]]
+			self.artifact_descriptions[key] = [runeword['special_desc']]
 
 		with open('extracted/LevelData', 'r', encoding='utf-8') as f:
 			for level in json.load(f)['Levels']:
