@@ -14,6 +14,7 @@ import yaml
 
 import extract_attributes
 import extract_descriptions
+import extract_runewords
 import game_data
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
@@ -42,6 +43,8 @@ def main():
 			'extracted/AttributesData')
 	os.link(ASSETS_DIR + 'Resources/gamedata/level/LevelData.json',
 			'extracted/LevelData')
+	os.link(ASSETS_DIR + 'Resources/gamedata/material/MaterialData.json',
+			'extracted/MaterialData')
 	os.link(ASSETS_DIR + 'Resources/gamedata/talent/TalentData.json',
 			'extracted/TalentData')
 	os.link(ASSETS_DIR + 'Resources/fonts/raw/indienovaBC-Regular-12px.ttf',
@@ -67,6 +70,7 @@ def main():
 	extract_talents()
 
 	extract_attributes.extract_attributes(dotnet_script_path, artifact_data)
+	extract_runewords.extract_runewords(dotnet_script_path)
 	data = game_data.GameData(artifact_descriptions=False)
 	for artifact in artifact_data:
 		try:

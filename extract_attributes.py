@@ -2,32 +2,7 @@ import subprocess
 import typing
 
 ASSETS_DIR = 'extracted/ExportedProject/Assets/'
-
-def extract_attributes(dotnet_script_path: str, artifacts: typing.Sequence[dict]):
-	csx_path = 'extracted/ArtifactAttributes.csx'
-	with open(csx_path, 'w', encoding='ascii') as f:
-		write_csx(f)
-
-		f.write('Artifact[] a = new Artifact[%d];\n' % len(artifacts))
-		for i, artifact in enumerate(artifacts):
-			f.write('a[%d].Key = "%s";\n' % (i, artifact['Key']))
-			if artifact.get('isDivine'):
-				f.write('a[%d].isDivine = true;\n' % i)
-			if 'maxAnomaly' in artifact:
-				f.write('a[%d].maxAnomaly = %d;\n' % (i, artifact['maxAnomaly']))
-		f.write('''
-Dictionary<string, List<List<ArtifactAttribute>>> attributes = new Dictionary<string, List<List<ArtifactAttribute>>>(a.Length);
-foreach (Artifact artifact in a) {
-	List<List<ArtifactAttribute>> anomArtifactAttrs = new List<List<ArtifactAttribute>>();
-	for (int anom = 0; anom <= artifact.maxAnomaly; anom++) {
-		ArtifactSaveInfo saveInfo = null;
-		if (artifact.maxAnomaly > 0) {
-			saveInfo = new ArtifactSaveInfo { anomaly = anom };
-		}
-		anomArtifactAttrs.Add(getArtifactBaseAttributes(artifact, saveInfo));
-	}
-	attributes[artifact.Key] = anomArtifactAttrs;
-}
+ATTRIBUTE_JSON_CONVERTER = '''
 public class AttributeJsonConverter : System.Text.Json.Serialization.JsonConverter<ArtifactAttribute> {
 	public override void Write(System.Text.Json.Utf8JsonWriter writer, ArtifactAttribute attr, System.Text.Json.JsonSerializerOptions options) {
 		writer.WriteStartObject();
@@ -41,6 +16,34 @@ public class AttributeJsonConverter : System.Text.Json.Serialization.JsonConvert
 	}
 	public override ArtifactAttribute Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options) =>
 			null;
+}
+'''
+
+def extract_attributes(dotnet_script_path: str, artifacts: typing.Sequence[dict]):
+	csx_path = 'extracted/ArtifactAttributes.csx'
+	with open(csx_path, 'w', encoding='ascii') as f:
+		write_csx(f)
+
+		f.write('Artifact[] a = new Artifact[%d];\n' % len(artifacts))
+		for i, artifact in enumerate(artifacts):
+			f.write('a[%d].Key = "%s";\n' % (i, artifact['Key']))
+			if artifact.get('isDivine'):
+				f.write('a[%d].isDivine = true;\n' % i)
+			if 'maxAnomaly' in artifact:
+				f.write('a[%d].maxAnomaly = %d;\n' % (i, artifact['maxAnomaly']))
+		f.write(ATTRIBUTE_JSON_CONVERTER)
+		f.write('''
+Dictionary<string, List<List<ArtifactAttribute>>> attributes = new Dictionary<string, List<List<ArtifactAttribute>>>(a.Length);
+foreach (Artifact artifact in a) {
+	List<List<ArtifactAttribute>> anomArtifactAttrs = new List<List<ArtifactAttribute>>();
+	for (int anom = 0; anom <= artifact.maxAnomaly; anom++) {
+		ArtifactSaveInfo saveInfo = null;
+		if (artifact.maxAnomaly > 0) {
+			saveInfo = new ArtifactSaveInfo { anomaly = anom };
+		}
+		anomArtifactAttrs.Add(getArtifactBaseAttributes(artifact, saveInfo));
+	}
+	attributes[artifact.Key] = anomArtifactAttrs;
 }
 var serializeOptions = new System.Text.Json.JsonSerializerOptions {
     WriteIndented = true,
