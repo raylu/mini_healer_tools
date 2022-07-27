@@ -22,15 +22,14 @@ public class RunewordJsonConverter : System.Text.Json.Serialization.JsonConverte
 		writer.WriteStartObject();
 		writer.WriteString("title", rw.title);
 
-		writer.WriteStartArray("rune_key");
-		foreach (string rune in rw.runeKey)
-			writer.WriteStringValue(rune);
-		writer.WriteEndArray();
+		writer.WritePropertyName("rune_key");
+		System.Text.Json.JsonSerializer.Serialize(writer, rw.runeKey);
 
-		writer.WriteStartArray("special_desc");
-		foreach (string desc in rw.specialDesc)
-			writer.WriteStringValue(desc);
-		writer.WriteEndArray();
+		writer.WritePropertyName("attributes");
+		System.Text.Json.JsonSerializer.Serialize(writer, rw.attributes, options);
+
+		writer.WritePropertyName("special_desc");
+		System.Text.Json.JsonSerializer.Serialize(writer, rw.specialDesc);
 
 		writer.WriteEndObject();
 	}
@@ -69,9 +68,17 @@ public class Runeword {
 	public List<string> specialDesc;
 	public Artifact.ArtifactSlotType slotType;
 }
-private static List<ArtifactAttribute> getRunewordsAttributes(string word) { return null; }
 private static Runeword getRunewordEffect(Runeword runeword) { return runeword; }
 static List<Runeword> runeWords = new List<Runeword>();
+
+class AttributesManager {
+	public ArtifactAttribute getBaseAttributByType(ArtifactAttribute.AttriubteType type) {
+		ArtifactAttribute attr = new ArtifactAttribute();
+		attr.attributeType = type;
+		return attr;
+	}
+	public static AttributesManager ATRM = new AttributesManager();
+}
 ''')
 	f.write(extract_descriptions.LOCALIZED_STRING)
 	f.writelines(extract_attributes.aa_lines())
@@ -82,6 +89,7 @@ def sdc_lines() -> list[str]:
 	function_needles = [
 		'void RefreshRunewordData()',
 		'string getRunewordsName',
+		'List<ArtifactAttribute> getRunewordsAttributes',
 		'List<string> getRunewordsSpecialDesc',
 	]
 	lines  = ['public class SocketDataController {\n']

@@ -75,23 +75,8 @@ class GameData:
 			with open('extracted/artifact_descriptions.json', 'r', encoding='utf-8') as f:
 				self.artifact_descriptions = json.load(f)
 
-		attr_data: dict[int, dict] = {}
-		with open('extracted/AttributesData', 'r', encoding='utf-8') as f:
-			for attr in json.load(f)['ArtifactAttributes']:
-				element = attr.get('associatedElement')
-				if element is not None:
-					element = DamageElement(element).name.lower()
-				attr_data[attr['attributeType']] = {
-					'element': element,
-					'text': attr['text'],
-					'postText': attr.get('postText'),
-				}
 		with open('extracted/artifact_attributes.json', 'r', encoding='utf-8') as f:
 			self.artifact_attributes: dict[list[list[dict]]] = json.load(f)
-			for anoms in self.artifact_attributes.values():
-				for attr_list in anoms:
-					for attr in attr_list:
-						attr.update(attr_data[attr['type']])
 
 		with open('extracted/runewords.json', 'r', encoding='ascii') as f:
 			runewords = json.load(f)
@@ -106,8 +91,24 @@ class GameData:
 			}
 			name = self.strings[runeword['title']]
 			self.artifact_names[name] = {'keys': [{'key': key, 'maxAnomaly': None}], 'rarity': None}
-			self.artifact_attributes[key] = [[]]
+			self.artifact_attributes[key] = [runeword['attributes']]
 			self.artifact_descriptions[key] = [runeword['special_desc']]
+
+		with open('extracted/AttributesData', 'r', encoding='utf-8') as f:
+			attr_data: dict[int, dict] = {}
+			for attr in json.load(f)['ArtifactAttributes']:
+				element = attr.get('associatedElement')
+				if element is not None:
+					element = DamageElement(element).name.lower()
+				attr_data[attr['attributeType']] = {
+					'element': element,
+					'text': attr['text'],
+					'postText': attr.get('postText'),
+				}
+			for anoms in self.artifact_attributes.values():
+				for attr_list in anoms:
+					for attr in attr_list:
+						attr.update(attr_data[attr['type']])
 
 		with open('extracted/LevelData', 'r', encoding='utf-8') as f:
 			for level in json.load(f)['Levels']:
