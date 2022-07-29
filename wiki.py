@@ -54,7 +54,7 @@ def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts:
 			if anomaly > 0:
 				filename += '_ANOMALY%d' % anomaly
 			filename += '.png'
-			r = api_request('post', data={
+			api_request('post', data={
 				'action': 'upload',
 				'filename': filename,
 				'comment': 'automatically created via github.com/raylu/mini_healer_tools',
@@ -90,7 +90,8 @@ def api_request(method: str, **kwargs) -> httpx.Response:
 	r.raise_for_status()
 	return r
 
-ARTIFACT_WIDTH = 460
+ARTIFACT_WIDTH = 480
+ICON_SIZE = 24
 ELEMENT_COLORS = {
 	'phsyical': (0xbc, 0xbc, 0xbc),
 	'fire': (0xff, 0x33, 0x33),
@@ -121,6 +122,23 @@ def render_artifact(data: game_data.GameData, key: str, anomaly: int) -> io.Byte
 
 	name = data.resolve_string(artifact['ArtifactName'])
 	draw.text((ARTIFACT_WIDTH // 2, 120), name, (158, 124, 46), big_font, 'mt')
+
+	icons = []
+	if artifact.get('isChaotic'):
+		icons.append('chaotic')
+	if artifact.get('isDivine'):
+		icons.append('divine')
+	elif artifact.get('isDivinable'):
+		icons.append('divinable')
+	if anomaly > 0:
+		icons.append('anomalous')
+	icon_y_offset = 100
+	for icon_name in icons:
+		pos = ((0, icon_y_offset), (ICON_SIZE, icon_y_offset + ICON_SIZE))
+		draw.rounded_rectangle(pos, outline=(187, 153, 136), radius=2)
+		with PIL.Image.open('static/artifact_%s.png' % icon_name) as icon:
+			image.paste(icon, (1, icon_y_offset + 1), icon)
+		icon_y_offset += ICON_SIZE + 4
 
 	types: list[str] = []
 	if artifact.get('isRuneword'):
@@ -201,7 +219,7 @@ def render_line(draw: PIL.ImageDraw.ImageDraw, font: PIL.ImageFont.ImageFont, y_
 		y_offset += 28 # textwrap.wrap('') doesn't yield anything
 	else:
 		for line in textwrap.wrap(s, 32):
-			draw.text((0, y_offset), line, color, font, 'lt')
+			draw.text((ICON_SIZE, y_offset), line, color, font, 'lt')
 			y_offset += 28
 	return y_offset
 
