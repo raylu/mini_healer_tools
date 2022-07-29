@@ -66,16 +66,22 @@ def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts:
 
 	artifact = data.artifacts[artifacts['keys'][0]['key']]
 	categories = ['Artifacts']
-	item_type = game_data.Types(artifact['Type']).name.capitalize()
-	categories.append(item_type)
+	if not artifact.get('isRuneword'):
+		item_type = game_data.Types(artifact['Type']).name.replace('_', ' ').title()
+		categories.append(item_type)
+		rarity = game_data.Rarities(artifact['Rarity']).name.capitalize()
 
 	text = '<gallery>\n'
 	text += '\n'.join('File:%s' % filename for filename in filenames)
 	text += '\n</gallery>'
-	text += '\n\n{{PAGENAME}} is a Unique ' + item_type
-	if 'droppedBossName' in artifact:
-		text += ' that drops from [[%s]] on %s' % (
-				artifact['droppedBossName'], artifact['droppedBossDifficulty'])
+	text += '\n\n{{PAGENAME}} is a '
+	if artifact.get('isRuneword'):
+		text += '[[Runeword]]'
+	else:
+		text += '%s %s ' % (rarity, item_type)
+		if 'droppedBossName' in artifact:
+			text += ' that drops from [[%s]] on %s' % (
+					artifact['droppedBossName'], artifact['droppedBossDifficulty'])
 	text += '.'
 	text += '\n\n==Mechanics==\n\n==Interactions with Talents=='
 	text += '\n\n==Interactions with Artifacts==\n\n----\n{{Uniques Navbox}}\n'
