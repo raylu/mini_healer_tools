@@ -62,7 +62,7 @@ ELEMENT_COLORS = {
 	'lightning': (0xef, 0xd7, 0x3c),
 	'nemesis': (0xce, 0x31, 0xc3),
 }
-def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
+def render_artifact(data: game_data.GameData, key: str, anomaly: int) -> io.BytesIO:
 	image = PIL.Image.new('RGB', (ARTIFACT_WIDTH, 1000))
 	draw = PIL.ImageDraw.Draw(image)
 	font = PIL.ImageFont.truetype('extracted/NormalTextPixelFont.ttf', 24)
@@ -71,6 +71,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 	with PIL.Image.open('static/artifact_frame.png') as frame:
 		image.paste(frame.resize((100, 100)), (ARTIFACT_WIDTH // 2 - 100 // 2, 0))
 
+	artifact = data.artifacts[key]
 	if artifact.get('isRuneword'):
 		icon_filepath = 'static/runes.png'
 	else:
@@ -166,6 +167,6 @@ def render_string(data: game_data.GameData, s: str) -> str:
 
 if __name__ == '__main__':
 	data = game_data.GameData()
-	b = render_artifact(data.artifacts['AURAMANCER_STONE'], 0)
+	b = render_artifact(data, 'AURAMANCER_STONE', 0)
 	with open('artifact_image.png', 'wb') as f:
 		f.write(b.getvalue())

@@ -36,7 +36,7 @@ class Types(enum.IntEnum):
 	HAMMER = 15
 	# slot 1
 	SHIELD = 4
-	BODY_ARMOR: 5
+	BODY_ARMOR = 5
 	HELM = 6
 	GLOVE = 7
 	BOOT = 17
