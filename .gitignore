@@ -10,4 +10,5 @@
 /static/favicon.png
 /static/runes.png
 /static/talents/
+/wiki_creds.py
 __pycache__/

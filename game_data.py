@@ -24,6 +24,38 @@ class Difficulty(enum.IntEnum):
 	BRUTAL = 1
 	INSANE = 2
 
+class Types(enum.IntEnum):
+	# slot 0
+	AXE = 0
+	SWORD = 1
+	WAND = 2
+	BOW = 3
+	DAGGER = 9
+	CLAW = 10
+	STAFF = 14
+	HAMMER = 15
+	# slot 1
+	SHIELD = 4
+	BODY_ARMOR: 5
+	HELM = 6
+	GLOVE = 7
+	BOOT = 17
+	PANTS = 19
+	# slot 2
+	RELIC = 8
+	ARROW = 11
+	RING = 12
+	AMULET = 13
+	# special
+	BELT = 16
+	MAP = 20
+
+class Rarities(enum.IntEnum):
+	UNCOMMON = 0
+	RARE = 1
+	EPIC = 2
+	UNIQUE = 3
+
 TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'BOSS', 'CONTEXT', 'EFFECT', 'MATERIAL', 'SKILL', 'TALENT', 'UI']
 
 class GameData:

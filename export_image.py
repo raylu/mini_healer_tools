@@ -82,7 +82,7 @@ def _draw_artifacts(data: game_data.GameData, items: list[list]) -> PIL.Image.Im
 		artifact = data.artifacts[key]
 
 		image.paste(frame, (0, y_offset))
-		if artifact['isRuneword']:
+		if artifact.get('isRuneword'):
 			icon_filepath = 'static/runes.png'
 		else:
 			icon_filename = artifact['Key']
