@@ -148,7 +148,7 @@ def render_artifact(data: game_data.GameData, key: str, anomaly: int) -> io.Byte
 		number = str(attr['t1_min'])
 		if attr['t1_min'] != attr['t1_max']:
 			number = '%d to %d' % (attr['t1_min'], attr['t1_max'])
-		attribute = render_string(data, text)
+		attribute = translate_string(data, text)
 		line = sign + number
 		if attribute[0] != '%':
 			line += ' '
@@ -164,26 +164,20 @@ def render_artifact(data: game_data.GameData, key: str, anomaly: int) -> io.Byte
 			color = ELEMENT_COLORS[attr['element']]
 		else:
 			color = (209, 209, 209)
-		draw.text((0, y_offset), line, color, font, 'lt')
-		y_offset += 28
+		y_offset = render_line(draw, font, y_offset, line, color)
 
 	if 'specialDesc' in artifact:
 		y_offset += 28
 		for desc in data.artifact_descriptions[artifact['Key']][anomaly]:
 			for orig_line in desc.split('<br>'):
-				if orig_line == '':
-					y_offset += 28 # textwrap.wrap('') doesn't yield anything
-				else:
-					desc = render_string(data, orig_line)
-					for line in textwrap.wrap(desc, 32):
-						draw.text((0, y_offset), line, (209, 209, 209), font, 'lt')
-						y_offset += 28
+				desc = translate_string(data, orig_line)
+				y_offset = render_line(draw, font, y_offset, desc, (209, 209, 209))
 
 	output = io.BytesIO()
 	image.crop((0, 0, ARTIFACT_WIDTH, y_offset)).save(output, 'png')
 	return output
 
-def render_string(data: game_data.GameData, s: str) -> str:
+def translate_string(data: game_data.GameData, s: str) -> str:
 	for m in re.finditer(r'\[(\S+)\]', s):
 		var = m.group(1)
 		try:
@@ -200,6 +194,16 @@ def render_string(data: game_data.GameData, s: str) -> str:
 						resolved = data.strings['UI_TOOLTIP_%s_NAME' % base]
 		s = s.replace('[%s]' % var, resolved)
 	return s
+
+def render_line(draw: PIL.ImageDraw.ImageDraw, font: PIL.ImageFont.ImageFont, y_offset: int,
+		s: str, color: tuple[int, int, int]) -> int:
+	if s == '':
+		y_offset += 28 # textwrap.wrap('') doesn't yield anything
+	else:
+		for line in textwrap.wrap(s, 32):
+			draw.text((0, y_offset), line, color, font, 'lt')
+			y_offset += 28
+	return y_offset
 
 if __name__ == '__main__':
 	main()
