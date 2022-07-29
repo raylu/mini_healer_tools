@@ -91,7 +91,7 @@ def api_request(method: str, **kwargs) -> httpx.Response:
 	return r
 
 ARTIFACT_WIDTH = 480
-ICON_SIZE = 24
+ICON_SIZE = 30
 ELEMENT_COLORS = {
 	'phsyical': (0xbc, 0xbc, 0xbc),
 	'fire': (0xff, 0x33, 0x33),
@@ -137,7 +137,8 @@ def render_artifact(data: game_data.GameData, key: str, anomaly: int) -> io.Byte
 		pos = ((0, icon_y_offset), (ICON_SIZE, icon_y_offset + ICON_SIZE))
 		draw.rounded_rectangle(pos, outline=(187, 153, 136), radius=2)
 		with PIL.Image.open('static/artifact_%s.png' % icon_name) as icon:
-			image.paste(icon, (1, icon_y_offset + 1), icon)
+			resized = icon.resize((ICON_SIZE, ICON_SIZE))
+			image.paste(resized, (1, icon_y_offset + 1), resized)
 		icon_y_offset += ICON_SIZE + 4
 
 	types: list[str] = []
@@ -224,4 +225,9 @@ def render_line(draw: PIL.ImageDraw.ImageDraw, font: PIL.ImageFont.ImageFont, y_
 	return y_offset
 
 if __name__ == '__main__':
-	main()
+	import sys
+	if sys.argv[1] == 'preview':
+		with open('artifact_image.png', 'wb') as f:
+			f.write(render_artifact(game_data.GameData(), sys.argv[2], int(sys.argv[3])).getvalue())
+	elif sys.argv[1] == 'create':
+		main()
