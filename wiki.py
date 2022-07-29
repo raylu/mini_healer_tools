@@ -39,7 +39,7 @@ def main():
 
 	data = game_data.GameData()
 	for name, artifacts in data.artifact_names.items():
-		if name in ["Auramancer's Stone", 'Combustion', 'Solarflare', 'Thundercrack']:
+		if name in ['Combustion', 'Solarflare', 'Thundercrack']:
 			continue
 		create_page(data, csrf_token, name, artifacts)
 
@@ -66,10 +66,14 @@ def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts:
 
 	artifact = data.artifacts[artifacts['keys'][0]['key']]
 	categories = ['Artifacts']
-	if not artifact.get('isRuneword'):
+	if artifact.get('isRuneword'):
+		categories.append('Runeword')
+	else:
 		item_type = game_data.Types(artifact['Type']).name.replace('_', ' ').title()
 		categories.append(item_type)
 		rarity = game_data.Rarities(artifact['Rarity']).name.capitalize()
+	if artifact.get('isDepth'):
+		categories.append('Depth')
 
 	text = '<gallery>\n'
 	text += '\n'.join('File:%s' % filename for filename in filenames)
@@ -78,10 +82,13 @@ def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts:
 	if artifact.get('isRuneword'):
 		text += '[[Runeword]]'
 	else:
-		text += '%s %s ' % (rarity, item_type)
+		text += '%s %s' % (rarity, item_type)
 		if 'droppedBossName' in artifact:
-			text += ' that drops from [[%s]] on %s' % (
-					artifact['droppedBossName'], artifact['droppedBossDifficulty'])
+			if artifact.get('isDepth'):
+				text += ' that drops in ' + artifact['droppedZone']
+			else:
+				text += ' that drops from [[%s]] on %s' % (
+						artifact['droppedBossName'], artifact['droppedBossDifficulty'])
 	text += '.'
 	text += '\n\n==Mechanics==\n\n==Interactions with Talents=='
 	text += '\n\n==Interactions with Artifacts==\n\n----\n{{Uniques Navbox}}\n'
