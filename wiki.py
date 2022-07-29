@@ -38,15 +38,51 @@ def main():
 	})
 	csrf_token = r.json()['query']['tokens']['csrftoken']
 
-	with open('static/artifacts/AURAMANCER_STONE.png', 'rb') as f:
-		r = api_request('post', data={
-			'action': 'upload',
-			'filename': 'AURAMANCER_STONE.png',
-			'comment': 'automatically created via github.com/raylu/mini_healer_tools',
-			'token': csrf_token,
-			'format': 'json',
-		}, files={'file': f})
-		print(r.text)
+	data = game_data.GameData()
+	for name, artifacts in data.artifact_names.items():
+		if name != 'Auramancer\'s Stone': continue
+		create_page(data, csrf_token, name, artifacts)
+
+def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts: dict):
+	filenames: list[str] = []
+	for key in artifacts['keys']:
+		max_anomaly = key.get('maxAnomaly') or 0
+		for anomaly in range(max_anomaly + 1):
+			b = render_artifact(data, key['key'], anomaly)
+			b.seek(0)
+			filename = key['key']
+			if anomaly > 0:
+				filename += '_ANOMALY%d' % anomaly
+			filename += '.png'
+			r = api_request('post', data={
+				'action': 'upload',
+				'filename': filename,
+				'comment': 'automatically created via github.com/raylu/mini_healer_tools',
+				'token': csrf_token,
+				#'ignorewarnings': 1, # replace existing images
+				'format': 'json',
+			}, files={'file': b})
+			filenames.append(filename)
+
+	artifact = data.artifacts[artifacts['keys'][0]['key']]
+	categories = ['Artifacts']
+	categories.append(game_data.Types(artifact['Type']).name.capitalize())
+
+	text = '\n'.join('[[File:%s]]' % filename for filename in filenames)
+	text += '\n\n----\n{{Uniques Navbox}}'
+	text += '\n'.join('[[Category:%s]]' % category for category in categories)
+
+	print(name, filenames)
+	r = api_request('post', data={
+		'action': 'edit',
+		'title': name + '/sandbox',
+		'text': text,
+		'summary': 'automatically created via github.com/raylu/mini_healer_tools',
+		#'createonly': 1,
+		'bot': 1,
+		'token': csrf_token,
+		'format': 'json',
+	})
 
 client = httpx.Client()
 def api_request(method: str, **kwargs) -> httpx.Response:
@@ -144,7 +180,7 @@ def render_artifact(data: game_data.GameData, key: str, anomaly: int) -> io.Byte
 						y_offset += 28
 
 	output = io.BytesIO()
-	image.crop((0, 0, ARTIFACT_WIDTH, y_offset)).save(output, 'webp')
+	image.crop((0, 0, ARTIFACT_WIDTH, y_offset)).save(output, 'png')
 	return output
 
 def render_string(data: game_data.GameData, s: str) -> str:
@@ -166,7 +202,4 @@ def render_string(data: game_data.GameData, s: str) -> str:
 	return s
 
 if __name__ == '__main__':
-	data = game_data.GameData()
-	b = render_artifact(data, 'AURAMANCER_STONE', 0)
-	with open('artifact_image.png', 'wb') as f:
-		f.write(b.getvalue())
+	main()
