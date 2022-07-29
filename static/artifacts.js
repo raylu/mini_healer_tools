@@ -172,7 +172,10 @@ class Artifacts {
 			propHTML.push('item level: ' + artifact['HiddenItemLevel']);
 		if (artifact['droppedBossName']) {
 			propHTML.push('dropped by: ' + artifact['droppedBossName']);
-			propHTML.push('difficulty: ' + artifact['droppedBossDifficulty']);
+			if (artifact['isDepth'])
+				propHTML.push('zone: ' + artifact['droppedZone']);
+			else
+				propHTML.push('difficulty: ' + artifact['droppedBossDifficulty']);
 		}
 		if (artifact['DropRate']) {
 			const dropRate = artifact['DropRate'].toLocaleString(undefined,

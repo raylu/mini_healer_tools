@@ -41,6 +41,8 @@ def main():
 			'extracted/ArtifactData')
 	os.link(ASSETS_DIR + 'Resources/gamedata/attribute/AttributesData.json',
 			'extracted/AttributesData')
+	os.link(ASSETS_DIR + 'Resources/gamedata/depth/DepthData.json',
+			'extracted/DepthData')
 	os.link(ASSETS_DIR + 'Resources/gamedata/level/LevelData.json',
 			'extracted/LevelData')
 	os.link(ASSETS_DIR + 'Resources/gamedata/material/MaterialData.json',

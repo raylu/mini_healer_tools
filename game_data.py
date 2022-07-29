@@ -56,7 +56,7 @@ class Rarities(enum.IntEnum):
 	EPIC = 2
 	UNIQUE = 3
 
-TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'BOSS', 'CONTEXT', 'EFFECT', 'MATERIAL', 'SKILL', 'TALENT', 'UI']
+TRANSLATION_FILES = ['ARTIFACT', 'ATTRIBUTE', 'BOSS', 'CONTEXT', 'DEPTH', 'EFFECT', 'MATERIAL', 'SKILL', 'TALENT', 'UI']
 
 class GameData:
 	def __init__(self, artifact_descriptions=True):
@@ -156,6 +156,24 @@ class GameData:
 						self.artifacts[key]['droppedBossName'] = self.strings[level['Title']]
 						difficulty_name = Difficulty(difficulty['Difficulty']).name.capitalize()
 						self.artifacts[key]['droppedBossDifficulty'] = difficulty_name
+		with open('extracted/DepthData', 'r', encoding='utf-8') as f:
+			depth_dict: dict[str, dict] = {depth['key']: depth for depth in json.load(f)['Depths']}
+		material_weight = 24 / (24 + 65) # see LootTableManager.getDepthDropNoDropLootTable
+		for depth in depth_dict.values():
+			if 'artifactsPool' not in depth:
+				continue
+			for key in depth['artifactsPool']:
+				artifact = self.artifacts[key]
+				assert artifact['isDepth']
+				assert 'droppedBossName' not in artifact
+				artifact['droppedBossName'] = 'Pandemonic Depth'
+				artifact['droppedZone'] = self.strings[depth['name']]
+				total_weight = len(depth['artifactsPool']) * 10
+				for pool in depth['includedDepthArtifactPool']:
+					# see LootTableManager.getDepthRoomDropTable
+					total_weight += len(depth_dict[pool]['artifactsPool']) * 10 / (len(depth['includedDepthArtifactPool']) + 1)
+				# see ItemAtlasUIManager.refreshArtifactInfoView
+				artifact['DropRate'] = 10 / total_weight * material_weight
 
 		with open('extracted/TalentData', 'r', encoding='utf-8') as f:
 			talent_data = json.load(f)['Talents']
