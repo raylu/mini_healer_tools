@@ -2,6 +2,7 @@
 
 import io
 import re
+import textwrap
 
 import httpx
 import PIL.Image
@@ -65,6 +66,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 	image = PIL.Image.new('RGB', (ARTIFACT_WIDTH, 1000))
 	draw = PIL.ImageDraw.Draw(image)
 	font = PIL.ImageFont.truetype('extracted/NormalTextPixelFont.ttf', 24)
+	big_font = PIL.ImageFont.truetype('extracted/NormalTextPixelFont.ttf', 30)
 
 	with PIL.Image.open('static/artifact_frame.png') as frame:
 		image.paste(frame.resize((96, 96)), (ARTIFACT_WIDTH // 2 - 96 // 2, 0))
@@ -81,7 +83,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 		image.paste(resized, (ARTIFACT_WIDTH // 2 - 64 // 2, 12), resized)
 
 	name = data.resolve_string(artifact['ArtifactName'])
-	draw.text((ARTIFACT_WIDTH // 2, 120), name, (158, 124, 46), font, 'mt')
+	draw.text((ARTIFACT_WIDTH // 2, 120), name, (158, 124, 46), big_font, 'mt')
 
 	types: list[str] = []
 	if artifact.get('isRuneword'):
@@ -94,7 +96,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 	if artifact.get('isChaotic'):
 		types.append('Chaotic')
 	types_str = '(%s)' % ', '.join(types)
-	draw.text((ARTIFACT_WIDTH // 2, 150), types_str, (119, 119, 119), font, 'mt')
+	draw.text((ARTIFACT_WIDTH // 2, 155), types_str, (119, 119, 119), font, 'mt')
 
 	y_offset = 200
 	for attr in data.artifact_attributes[artifact['Key']][anomaly]:
@@ -127,6 +129,18 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 			color = (209, 209, 209)
 		draw.text((0, y_offset), line, color, font, 'lt')
 		y_offset += 28
+
+	if 'specialDesc' in artifact:
+		y_offset += 28
+		for desc in data.artifact_descriptions[artifact['Key']][anomaly]:
+			for orig_line in desc.split('<br>'):
+				if orig_line == '':
+					y_offset += 28 # textwrap.wrap('') doesn't yield anything
+				else:
+					desc = render_string(data, orig_line)
+					for line in textwrap.wrap(desc, 32):
+						draw.text((0, y_offset), line, (209, 209, 209), font, 'lt')
+						y_offset += 28
 
 	output = io.BytesIO()
 	image.save(output, 'webp')
