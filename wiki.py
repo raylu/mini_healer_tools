@@ -40,7 +40,8 @@ def main():
 
 	data = game_data.GameData()
 	for name, artifacts in data.artifact_names.items():
-		if name != 'Auramancer\'s Stone': continue
+		if name in ["Auramancer's Stone", 'Combustion', 'Solarflare', 'Thundercrack']:
+			continue
 		create_page(data, csrf_token, name, artifacts)
 
 def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts: dict):
@@ -69,16 +70,16 @@ def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts:
 	categories.append(game_data.Types(artifact['Type']).name.capitalize())
 
 	text = '\n'.join('[[File:%s]]' % filename for filename in filenames)
-	text += '\n\n----\n{{Uniques Navbox}}'
+	text += '\n\n----\n{{Uniques Navbox}}\n'
 	text += '\n'.join('[[Category:%s]]' % category for category in categories)
 
 	print(name, filenames)
 	r = api_request('post', data={
 		'action': 'edit',
-		'title': name + '/sandbox',
+		'title': name,
 		'text': text,
 		'summary': 'automatically created via github.com/raylu/mini_healer_tools',
-		#'createonly': 1,
+		'createonly': 1,
 		'bot': 1,
 		'token': csrf_token,
 		'format': 'json',
