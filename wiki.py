@@ -69,7 +69,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 	big_font = PIL.ImageFont.truetype('extracted/NormalTextPixelFont.ttf', 30)
 
 	with PIL.Image.open('static/artifact_frame.png') as frame:
-		image.paste(frame.resize((96, 96)), (ARTIFACT_WIDTH // 2 - 96 // 2, 0))
+		image.paste(frame.resize((100, 100)), (ARTIFACT_WIDTH // 2 - 100 // 2, 0))
 
 	if artifact.get('isRuneword'):
 		icon_filepath = 'static/runes.png'
@@ -80,7 +80,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 		icon_filepath = 'static/artifacts/%s.png' % icon_filename
 	with PIL.Image.open(icon_filepath) as icon:
 		resized = icon.resize((64, 64))
-		image.paste(resized, (ARTIFACT_WIDTH // 2 - 64 // 2, 12), resized)
+		image.paste(resized, (ARTIFACT_WIDTH // 2 - 64 // 2, 16), resized)
 
 	name = data.resolve_string(artifact['ArtifactName'])
 	draw.text((ARTIFACT_WIDTH // 2, 120), name, (158, 124, 46), big_font, 'mt')
@@ -143,7 +143,7 @@ def render_artifact(artifact: dict, anomaly: int) -> io.BytesIO:
 						y_offset += 28
 
 	output = io.BytesIO()
-	image.save(output, 'webp')
+	image.crop((0, 0, ARTIFACT_WIDTH, y_offset)).save(output, 'webp')
 	return output
 
 def render_string(data: game_data.GameData, s: str) -> str:
