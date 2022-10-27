@@ -108,7 +108,7 @@ def create_page(data: game_data.GameData, csrf_token: str, name: str, artifacts:
 
 client = httpx.Client()
 def api_request(method: str, **kwargs) -> httpx.Response:
-	r = client.request(method, 'https://minihealer.fandom.com/api.php', **kwargs)
+	r = client.request(method, 'https://minihealer.fandom.com/api.php', timeout=10, **kwargs)
 	r.raise_for_status()
 	return r
 
